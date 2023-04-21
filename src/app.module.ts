@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { HistoryModule } from './history/history.module';
 
 @Module({
   imports: [
@@ -15,8 +16,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
       autoLoadEntities: true,
     }),
+    HistoryModule,
   ],
-  controllers: [],
   providers: [],
 })
 export class AppModule {}
