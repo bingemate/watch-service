@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryModule } from './history/history.module';
+import { WatchListModule } from './watch-list/watch-list.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { HistoryModule } from './history/history.module';
       autoLoadEntities: true,
     }),
     HistoryModule,
+    WatchListModule,
   ],
   providers: [],
 })
