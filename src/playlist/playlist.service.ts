@@ -24,26 +24,26 @@ export class PlaylistService {
   async getPlaylistsByUserId(userId: string): Promise<PlaylistEntity[]> {
     return this.playlistRepository
       .createQueryBuilder()
-      .where('userId=:userId', { userId })
+      .where('PlaylistEntity.userId=:userId', { userId })
       .getMany();
   }
 
   async getPlaylistItems(playlistId: string): Promise<PlaylistItemEntity[]> {
     return this.playlistItemRepository
       .createQueryBuilder()
-      .where('playlistId=:playlistId', { playlistId })
-      .orderBy('order', 'ASC')
+      .where('PlaylistItemEntity.playlistId=:playlistId', { playlistId })
+      .orderBy('PlaylistItemEntity.position', 'ASC')
       .getMany();
   }
 
   async addMediaToPlaylist(playlistId: string, mediaId: string): Promise<void> {
-    const maxOrder = await this.playlistItemRepository.maximum('order', {
+    const maxPosition = await this.playlistItemRepository.maximum('position', {
       playlistId,
     });
     await this.playlistItemRepository.save({
       playlistId,
       mediaId,
-      order: maxOrder + 1,
+      position: maxPosition + 1,
     });
   }
 
@@ -56,7 +56,7 @@ export class PlaylistService {
       medias: playlistUpdate.medias.map((item, index) => ({
         mediaId: item.mediaId,
         playlistId: playlistUpdate.id,
-        order: index,
+        position: index,
       })),
     };
     await this.playlistRepository.save(playlist);

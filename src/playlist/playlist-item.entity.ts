@@ -13,5 +13,5 @@ export class PlaylistItemEntity {
   playlist: PlaylistEntity;
 
   @Column()
-  order: number;
+  position: number;
 }
