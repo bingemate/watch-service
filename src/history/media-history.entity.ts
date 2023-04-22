@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('media_history')
 export class MediaHistoryEntity {
   @PrimaryColumn('uuid')
   mediaId: string;

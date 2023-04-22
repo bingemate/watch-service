@@ -1,5 +1,0 @@
-export enum UpdateMediaHistoryTypeDto {
-  START_READING = 'START_READING',
-  READING = 'READING',
-  FINISHED_READING = 'FINISHED_READING',
-}

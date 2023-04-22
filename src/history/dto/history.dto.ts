@@ -1,5 +1,7 @@
 import { MediaHistoryDto } from './media-history.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export interface HistoryDto {
+export class HistoryDto {
+  @ApiProperty({ type: [MediaHistoryDto] })
   medias: MediaHistoryDto[];
 }

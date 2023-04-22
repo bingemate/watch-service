@@ -1,6 +1,19 @@
-import { Controller, Delete, Get, Headers, Param } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  HttpCode,
+  Param,
+} from '@nestjs/common';
 import { HistoryDto } from './dto/history.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { HistoryService } from './history.service';
 
 @ApiTags('/history')
@@ -8,24 +21,36 @@ import { HistoryService } from './history.service';
 export class HistoryController {
   constructor(private historyService: HistoryService) {}
 
-  @Get('/:userId')
-  async getUsersHistory(@Param('userId') userId: string): Promise<HistoryDto> {
+  @ApiOperation({ description: "Get current user's history" })
+  @ApiOkResponse({
+    type: HistoryDto,
+  })
+  @Get()
+  async getUsersHistory(@Headers() headers): Promise<HistoryDto> {
+    const userId = headers.userid;
     const mediasHistory = await this.historyService.getHistoryByUserId(userId);
+    console.log(userId);
     return {
       medias: mediasHistory.map((history) => ({
         mediaId: history.mediaId,
-        userId: history.userId,
+        userId: userId,
         stoppedAt: history.stoppedAt,
       })),
     };
   }
 
+  @ApiOperation({
+    description: 'Delete history entry of current user',
+  })
+  @ApiNoContentResponse()
+  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @HttpCode(204)
   @Delete('/:mediaId')
   async deleteUsersMediaHistory(
     @Param('mediaId') mediaId: string,
-    @Headers() headers: Headers,
+    @Headers() headers,
   ): Promise<void> {
-    const userId = headers.get('userId');
+    const userId = headers.userid;
     return await this.historyService.deleteMediaHistory(mediaId, userId);
   }
 }

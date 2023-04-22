@@ -24,11 +24,6 @@ export class HistoryService {
   }
 
   async deleteMediaHistory(mediaId: string, userId: string): Promise<void> {
-    await this.mediaHistoryRepository
-      .createQueryBuilder()
-      .where('MediaHistoryEntity.mediaId=:mediaId', { mediaId })
-      .andWhere('MediaHistoryEntity.userId=:userId', { userId })
-      .delete()
-      .execute();
+    await this.mediaHistoryRepository.delete({ mediaId, userId });
   }
 }

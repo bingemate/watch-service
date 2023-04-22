@@ -1,7 +1,10 @@
-import { UpdateMediaHistoryTypeDto } from './update-media-history-type.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export interface UpdateMediaHistoryDto {
+export class UpdateMediaHistoryDto {
+  @ApiProperty({ format: 'uuid' })
   mediaId: string;
-  updateType: UpdateMediaHistoryTypeDto;
+  @ApiProperty({ enum: ['OPENED_MEDIA', 'UPDATE', 'CLOSED_MEDIA'] })
+  updateType: string;
+  @ApiProperty()
   stoppedAt: number;
 }
