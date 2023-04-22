@@ -17,10 +17,12 @@ export class HistoryGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateMediaHistoryDto,
   ): Promise<void> {
-    await this.historyService.upsertMediaHistory({
+    const mediaHistory = {
       mediaId: historyUpdate.mediaId,
       userId: client.handshake.headers.userid as string,
       stoppedAt: historyUpdate.stoppedAt,
-    });
+    };
+
+    await this.historyService.upsertMediaHistory(mediaHistory);
   }
 }

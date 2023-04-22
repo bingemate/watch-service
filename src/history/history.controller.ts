@@ -17,7 +17,7 @@ import {
 import { HistoryService } from './history.service';
 
 @ApiTags('/history')
-@Controller('/history')
+@Controller({ path: '/history' })
 export class HistoryController {
   constructor(private historyService: HistoryService) {}
 
