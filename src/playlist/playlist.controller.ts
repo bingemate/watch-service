@@ -7,6 +7,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -27,13 +28,13 @@ import { PlaylistsDto } from './dto/playlists.dto';
 export class PlaylistController {
   constructor(private playlistService: PlaylistService) {}
 
-  @ApiBody({ type: PlaylistItemsDto })
+  @ApiBody({ type: CreatePlaylistDto })
   @ApiCreatedResponse({ type: String })
   @HttpCode(201)
   @Post()
   async createPlaylist(
     @Headers() headers,
-    playlistCreationDto: CreatePlaylistDto,
+    @Body() playlistCreationDto: CreatePlaylistDto,
   ): Promise<string> {
     const userId = headers.userid as string;
     return await this.playlistService.createPlaylist({
@@ -93,7 +94,7 @@ export class PlaylistController {
   @Put('/:playlistId')
   async updatePlaylist(
     @Param('playlistId') playlistId: string,
-    playlistItemsDto: PlaylistItemsDto,
+    @Body() playlistItemsDto: PlaylistItemsDto,
   ): Promise<void> {
     await this.playlistService.updatePlaylist({
       id: playlistId,
