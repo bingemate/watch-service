@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { HistoryUpdateTypeEnum } from '../history-update-type.enum';
 
 export class UpdateMediaHistoryDto {
   @ApiProperty({ format: 'uuid' })
   mediaId: string;
-  @ApiProperty({ enum: ['OPENED_MEDIA', 'UPDATE', 'CLOSED_MEDIA'] })
+  @ApiProperty({ enum: HistoryUpdateTypeEnum })
   updateType: string;
   @ApiProperty()
   stoppedAt: number;
