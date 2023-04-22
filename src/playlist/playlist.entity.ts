@@ -12,6 +12,8 @@ export class PlaylistEntity {
   @Column()
   name: string;
 
-  @OneToMany(() => PlaylistItemEntity, (media) => media.playlist)
+  @OneToMany(() => PlaylistItemEntity, (media) => media.playlist, {
+    cascade: true,
+  })
   medias: PlaylistItemEntity[];
 }

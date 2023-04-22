@@ -3,12 +3,16 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
   Put,
 } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
+import { PlaylistItemsDto } from './dto/playlist-items.dto';
+import { PlaylistDto } from './dto/playlist.dto';
+import { CreatePlaylistDto } from './dto/create-playlist.dto';
 
 @ApiTags('/playlist')
 @Controller('/playlist')
@@ -16,22 +20,64 @@ export class PlaylistController {
   constructor(private playlistService: PlaylistService) {}
 
   @Post()
-  createPlaylist(): string {
-    return '';
+  async createPlaylist(
+    @Headers() headers,
+    playlistCreationDto: CreatePlaylistDto,
+  ): Promise<string> {
+    const userId = headers.userid as string;
+    return await this.playlistService.createPlaylist({
+      name: playlistCreationDto.name,
+      userId,
+    });
   }
 
   @Get('/user/:userId')
-  getPlaylistsByUserId(@Param('userId') userId: string) {}
+  async getPlaylistsByUserId(
+    @Param('userId') userId: string,
+  ): Promise<PlaylistDto[]> {
+    const playlists = await this.playlistService.getPlaylistsByUserId(userId);
+    return playlists.map((playlist) => ({
+      id: playlist.id,
+      userId: playlist.userId,
+      name: playlist.name,
+    }));
+  }
 
   @Get('/:playlistId')
-  getPlaylistItems(@Param('playlistId') playlistId: string) {}
+  async getPlaylistItems(
+    @Param('playlistId') playlistId: string,
+  ): Promise<PlaylistItemsDto> {
+    const playlistItems = await this.playlistService.getPlaylistItems(
+      playlistId,
+    );
+    return {
+      items: playlistItems.map((playlistItem) => ({
+        mediaId: playlistItem.mediaId,
+      })),
+    };
+  }
 
-  @Patch('/:mediaId')
-  addMediaToPlaylist(@Param('mediaId') mediaId: string): void {}
+  @Patch('/:playlistId/:mediaId')
+  async addMediaToPlaylist(
+    @Param('playlistId') playlistId: string,
+    @Param('mediaId') mediaId: string,
+  ): Promise<void> {
+    await this.playlistService.addMediaToPlaylist(playlistId, mediaId);
+  }
 
   @Put('/:playlistId')
-  updatePlaylist(@Param('playlistId') playlistId: string): void {}
+  async updatePlaylist(
+    @Param('playlistId') playlistId: string,
+    playlistItemsDto: PlaylistItemsDto,
+  ): Promise<void> {
+    await this.playlistService.updatePlaylist({
+      id: playlistId,
+      medias: playlistItemsDto.items.map((item) => ({ mediaId: item.mediaId })),
+    });
+  }
 
   @Delete('/:playlistId')
-  deletePlaylist(@Param('playlistId') playlistId: string): void {}
+  async deletePlaylist(@Param('playlistId') playlistId: string): Promise<void> {
+    await this.playlistService.deletePlaylist(playlistId);
+  }
 }
