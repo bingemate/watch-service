@@ -9,7 +9,9 @@ export class PlaylistItemEntity {
   @PrimaryColumn('uuid')
   playlistId: string;
 
-  @ManyToOne(() => PlaylistEntity, (playlist) => playlist.medias)
+  @ManyToOne(() => PlaylistEntity, (playlist) => playlist.medias, {
+    onDelete: 'CASCADE',
+  })
   playlist: PlaylistEntity;
 
   @Column()
