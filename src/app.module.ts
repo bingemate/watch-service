@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryModule } from './history/history.module';
 import { WatchListModule } from './watch-list/watch-list.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     HistoryModule,
     WatchListModule,
+    PlaylistModule,
   ],
   providers: [],
 })
