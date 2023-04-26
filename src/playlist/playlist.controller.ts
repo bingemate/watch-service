@@ -36,7 +36,7 @@ export class PlaylistController {
     @Headers() headers,
     @Body() playlistCreationDto: CreatePlaylistDto,
   ): Promise<string> {
-    const userId = headers.userid as string;
+    const userId = headers['userid'] as string;
     return await this.playlistService.createPlaylist({
       name: playlistCreationDto.name,
       userId,

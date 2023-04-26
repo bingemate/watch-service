@@ -27,7 +27,7 @@ export class HistoryController {
   })
   @Get()
   async getUsersHistory(@Headers() headers): Promise<HistoryDto> {
-    const userId = headers.userid;
+    const userId = headers['userid'];
     const mediasHistory = await this.historyService.getHistoryByUserId(userId);
     console.log(userId);
     return {
@@ -50,7 +50,7 @@ export class HistoryController {
     @Param('mediaId') mediaId: string,
     @Headers() headers,
   ): Promise<void> {
-    const userId = headers.userid;
+    const userId = headers['userid'];
     return await this.historyService.deleteMediaHistory(mediaId, userId);
   }
 }
