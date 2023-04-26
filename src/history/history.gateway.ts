@@ -24,7 +24,7 @@ export class HistoryGateway {
   ): Promise<void> {
     const mediaHistory = {
       mediaId: historyUpdate.mediaId,
-      userId: client.handshake.headers['userid'] as string,
+      userId: client.handshake.headers['user-id'] as string,
       stoppedAt: historyUpdate.stoppedAt,
     };
 
@@ -32,7 +32,7 @@ export class HistoryGateway {
     if (historyUpdate.updateType !== HistoryUpdateTypeEnum.UPDATE) {
       this.eventEmitter.emit(`history.updated`, {
         mediaId: historyUpdate.mediaId,
-        userId: client.handshake.headers['userid'] as string,
+        userId: client.handshake.headers['user-id'] as string,
         stoppedAt: historyUpdate.stoppedAt,
       });
     }
