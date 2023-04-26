@@ -22,6 +22,7 @@ import { PlaylistService } from './playlist.service';
 import { PlaylistItemsDto } from './dto/playlist-items.dto';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { PlaylistsDto } from './dto/playlists.dto';
+import { PlaylistIdDto } from './dto/playlist-id.dto';
 
 @ApiTags('/playlist')
 @Controller('/playlist')
@@ -29,18 +30,20 @@ export class PlaylistController {
   constructor(private playlistService: PlaylistService) {}
 
   @ApiBody({ type: CreatePlaylistDto })
-  @ApiCreatedResponse({ type: String })
+  @ApiCreatedResponse({ type: PlaylistIdDto })
   @HttpCode(201)
   @Post()
   async createPlaylist(
     @Headers() headers,
     @Body() playlistCreationDto: CreatePlaylistDto,
-  ): Promise<string> {
+  ): Promise<PlaylistIdDto> {
     const userId = headers['user-id'] as string;
-    return await this.playlistService.createPlaylist({
-      name: playlistCreationDto.name,
-      userId,
-    });
+    return {
+      id: await this.playlistService.createPlaylist({
+        name: playlistCreationDto.name,
+        userId,
+      }),
+    };
   }
 
   @ApiParam({ name: 'userId', format: 'uuid' })
