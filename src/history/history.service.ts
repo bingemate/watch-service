@@ -49,7 +49,7 @@ export class HistoryService {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
       .where('MediaHistoryEntity.userId=:userId', { userId })
-      .where('MediaHistoryEntity.mediaId=:mediaId', { mediaId })
+      .andWhere('MediaHistoryEntity.mediaId=:mediaId', { mediaId })
       .getOne();
   }
 }
