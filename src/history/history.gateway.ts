@@ -41,7 +41,6 @@ export class HistoryGateway
     this.userSessions.delete(client.id);
     mediaHistory.finishedAt = new Date();
 
-    this.eventEmitter.emit(`history.updated`, mediaHistory);
     if (
       Math.abs(
         mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
@@ -60,14 +59,23 @@ export class HistoryGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateMediaHistoryDto,
   ): Promise<void> {
-    const mediaHistory = {
-      id: this.userSessions.get(client.id),
-      stoppedAt: historyUpdate.stoppedAt,
-      finishedAt: undefined,
-    };
+    const mediaHistory = await this.historyService.getHistoryById(
+      this.userSessions.get(client.id),
+    );
+    mediaHistory.stoppedAt = historyUpdate.stoppedAt;
+    this.eventEmitter.emit(`history.updated`, mediaHistory);
     if (HistoryUpdateTypeEnum.PAUSED === historyUpdate.updateType) {
-      await this.onPaused(client.id);
-      return;
+      mediaHistory.finishedAt = new Date();
+      if (
+        Math.abs(
+          mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
+        ) /
+          1000 <
+        60
+      ) {
+        await this.historyService.deleteMediaHistory(mediaHistory.id);
+      }
+      this.userSessions.delete(client.id);
     } else if (HistoryUpdateTypeEnum.UNPAUSED === historyUpdate.updateType) {
       await this.createUserPeriod(
         client.id,
@@ -90,22 +98,5 @@ export class HistoryGateway
       startedAt: new Date(),
     });
     this.userSessions.set(clientId, id);
-  }
-
-  private async onPaused(clientId: string) {
-    const mediaHistory = await this.historyService.getHistoryById(
-      this.userSessions.get(clientId),
-    );
-    mediaHistory.finishedAt = new Date();
-    if (
-      Math.abs(
-        mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
-      ) /
-        1000 <
-      60
-    ) {
-      await this.historyService.deleteMediaHistory(mediaHistory.id);
-    }
-    this.userSessions.delete(clientId);
   }
 }
