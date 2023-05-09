@@ -35,6 +35,9 @@ export class HistoryGateway
   }
 
   async handleDisconnect(client: Socket) {
+    if (!this.userSessions.has(client.id)) {
+      return;
+    }
     const mediaHistory = await this.historyService.getHistoryById(
       this.userSessions.get(client.id),
     );
