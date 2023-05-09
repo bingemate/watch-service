@@ -26,8 +26,8 @@ export class HistoryService {
     userId: string;
     stoppedAt: number;
     startedAt: Date;
-  }): Promise<string> {
-    return (await this.mediaHistoryRepository.save(mediaHistoryEntity)).id;
+  }): Promise<MediaHistoryEntity> {
+    return await this.mediaHistoryRepository.save(mediaHistoryEntity);
   }
 
   async updateMediaHistory(mediaHistoryEntity: {
@@ -40,5 +40,16 @@ export class HistoryService {
 
   async deleteMediaHistory(id: string): Promise<void> {
     await this.mediaHistoryRepository.delete({ id });
+  }
+
+  async getLastPeriod(
+    userId: string,
+    mediaId: string,
+  ): Promise<MediaHistoryEntity> {
+    return await this.mediaHistoryRepository
+      .createQueryBuilder()
+      .where('MediaHistoryEntity.userId=:userId', { userId })
+      .where('MediaHistoryEntity.mediaId=:mediaId', { mediaId })
+      .getOne();
   }
 }

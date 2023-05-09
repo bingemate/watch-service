@@ -54,21 +54,24 @@ export class HistoryGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateMediaHistoryDto,
   ): Promise<void> {
-    const mediaHistory = await this.historyService.getHistoryById(
-      this.userSessions.get(client.id),
-    );
+    let mediaHistory;
+    if (HistoryUpdateTypeEnum.UNPAUSED === historyUpdate.updateType) {
+      mediaHistory = await this.createUserPeriod(
+        client.id,
+        client.handshake.headers['user-id'] as string,
+        client.handshake.query.mediaId as string,
+      );
+    } else {
+      mediaHistory = await this.historyService.getHistoryById(
+        this.userSessions.get(client.id),
+      );
+    }
     mediaHistory.stoppedAt = historyUpdate.stoppedAt;
     this.eventEmitter.emit(`history.updated`, mediaHistory);
     if (HistoryUpdateTypeEnum.PAUSED === historyUpdate.updateType) {
       if (await this.closePeriod(mediaHistory, client.id)) {
         return;
       }
-    } else if (HistoryUpdateTypeEnum.UNPAUSED === historyUpdate.updateType) {
-      await this.createUserPeriod(
-        client.id,
-        client.handshake.headers['user-id'] as string,
-        client.handshake.query.mediaId as string,
-      );
     }
     await this.historyService.updateMediaHistory(mediaHistory);
   }
@@ -78,13 +81,14 @@ export class HistoryGateway
     userId: string,
     mediaId: string,
   ) {
-    const id = await this.historyService.createMediaHistory({
+    const history = await this.historyService.createMediaHistory({
       mediaId,
       userId,
       stoppedAt: 0,
       startedAt: new Date(),
     });
-    this.userSessions.set(clientId, id);
+    this.userSessions.set(clientId, history.id);
+    return history;
   }
 
   private async closePeriod(
@@ -93,13 +97,20 @@ export class HistoryGateway
   ) {
     mediaHistory.finishedAt = new Date();
     this.userSessions.delete(clientId);
+    const lastPeriod = await this.historyService.getLastPeriod(
+      mediaHistory.userId,
+      mediaHistory.mediaId,
+    );
     if (
+      lastPeriod &&
       Math.abs(
         mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
       ) /
         1000 <
-      60
+        60
     ) {
+      lastPeriod.stoppedAt = mediaHistory.stoppedAt;
+      await this.historyService.updateMediaHistory(lastPeriod);
       await this.historyService.deleteMediaHistory(mediaHistory.id);
       return true;
     }
