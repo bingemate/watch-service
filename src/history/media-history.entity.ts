@@ -17,6 +17,6 @@ export class MediaHistoryEntity {
   @Column()
   startedAt: Date;
 
-  @Column()
-  finishedAt: Date;
+  @Column({ nullable: true })
+  finishedAt?: Date;
 }

@@ -17,13 +17,28 @@ export class HistoryService {
       .getMany();
   }
 
-  async upsertMediaHistory(
-    mediaHistoryEntity: MediaHistoryEntity,
-  ): Promise<void> {
+  async getHistoryById(id: string): Promise<MediaHistoryEntity> {
+    return await this.mediaHistoryRepository.findOne({ where: { id } });
+  }
+
+  async createMediaHistory(mediaHistoryEntity: {
+    mediaId: string;
+    userId: string;
+    stoppedAt: number;
+    startedAt: Date;
+  }): Promise<string> {
+    return (await this.mediaHistoryRepository.save(mediaHistoryEntity)).id;
+  }
+
+  async updateMediaHistory(mediaHistoryEntity: {
+    id: string;
+    stoppedAt: number;
+    finishedAt?: Date;
+  }): Promise<void> {
     await this.mediaHistoryRepository.save(mediaHistoryEntity);
   }
 
-  async deleteMediaHistory(mediaId: string, userId: string): Promise<void> {
-    await this.mediaHistoryRepository.delete({ mediaId, userId });
+  async deleteMediaHistory(id: string): Promise<void> {
+    await this.mediaHistoryRepository.delete({ id });
   }
 }
