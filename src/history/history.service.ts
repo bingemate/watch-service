@@ -38,8 +38,13 @@ export class HistoryService {
     await this.mediaHistoryRepository.save(mediaHistoryEntity);
   }
 
-  async deleteMediaHistory(id: string): Promise<void> {
-    await this.mediaHistoryRepository.delete({ id });
+  async deleteMediaHistory(id: string, userId: string): Promise<void> {
+    await this.mediaHistoryRepository
+      .createQueryBuilder()
+      .where('MediaHistoryEntity.id=:id', { id })
+      .andWhere('MediaHistoryEntity.userId=:userId', { userId })
+      .delete()
+      .execute();
   }
 
   async getLastPeriod(

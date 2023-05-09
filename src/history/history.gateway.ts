@@ -111,7 +111,10 @@ export class HistoryGateway
     ) {
       lastPeriod.stoppedAt = mediaHistory.stoppedAt;
       await this.historyService.updateMediaHistory(lastPeriod);
-      await this.historyService.deleteMediaHistory(mediaHistory.id);
+      await this.historyService.deleteMediaHistory(
+        mediaHistory.id,
+        mediaHistory.userId,
+      );
       return true;
     }
     return false;

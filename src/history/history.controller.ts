@@ -49,6 +49,7 @@ export class HistoryController {
     @Param('id') id: string,
     @Headers() headers,
   ): Promise<void> {
-    return await this.historyService.deleteMediaHistory(id);
+    const userId = headers['user-id'] as string;
+    return await this.historyService.deleteMediaHistory(id, userId);
   }
 }
