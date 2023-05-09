@@ -11,6 +11,7 @@ import { UpdateMediaHistoryDto } from './dto/update-media-history.dto';
 import { HistoryService } from './history.service';
 import { HistoryUpdateTypeEnum } from './history-update-type.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MediaHistoryEntity } from './media-history.entity';
 
 @WebSocketGateway({ namespace: 'watch' })
 export class HistoryGateway
@@ -42,16 +43,7 @@ export class HistoryGateway
       this.userSessions.get(client.id),
     );
     this.userSessions.delete(client.id);
-    mediaHistory.finishedAt = new Date();
-
-    if (
-      Math.abs(
-        mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
-      ) /
-        1000 <
-      60
-    ) {
-      await this.historyService.deleteMediaHistory(mediaHistory.id);
+    if (await this.closePeriod(mediaHistory, client.id)) {
       return;
     }
     await this.historyService.updateMediaHistory(mediaHistory);
@@ -68,17 +60,9 @@ export class HistoryGateway
     mediaHistory.stoppedAt = historyUpdate.stoppedAt;
     this.eventEmitter.emit(`history.updated`, mediaHistory);
     if (HistoryUpdateTypeEnum.PAUSED === historyUpdate.updateType) {
-      mediaHistory.finishedAt = new Date();
-      if (
-        Math.abs(
-          mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
-        ) /
-          1000 <
-        60
-      ) {
-        await this.historyService.deleteMediaHistory(mediaHistory.id);
+      if (await this.closePeriod(mediaHistory, client.id)) {
+        return;
       }
-      this.userSessions.delete(client.id);
     } else if (HistoryUpdateTypeEnum.UNPAUSED === historyUpdate.updateType) {
       await this.createUserPeriod(
         client.id,
@@ -101,5 +85,24 @@ export class HistoryGateway
       startedAt: new Date(),
     });
     this.userSessions.set(clientId, id);
+  }
+
+  private async closePeriod(
+    mediaHistory: MediaHistoryEntity,
+    clientId: string,
+  ) {
+    mediaHistory.finishedAt = new Date();
+    this.userSessions.delete(clientId);
+    if (
+      Math.abs(
+        mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
+      ) /
+        1000 <
+      60
+    ) {
+      await this.historyService.deleteMediaHistory(mediaHistory.id);
+      return true;
+    }
+    return false;
   }
 }
