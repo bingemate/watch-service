@@ -63,11 +63,8 @@ export class HistoryGateway
       finishedAt: undefined,
     };
     if (HistoryUpdateTypeEnum.PAUSED === historyUpdate.updateType) {
-      const mediaHistory = await this.historyService.getHistoryById(
-        this.userSessions.get(client.id),
-      );
-      mediaHistory.finishedAt = new Date();
-      this.userSessions.delete(client.id);
+      await this.onPaused(client.id);
+      return;
     } else if (HistoryUpdateTypeEnum.UNPAUSED === historyUpdate.updateType) {
       await this.createUserPeriod(
         client.id,
@@ -90,5 +87,22 @@ export class HistoryGateway
       startedAt: new Date(),
     });
     this.userSessions.set(clientId, id);
+  }
+
+  private async onPaused(clientId: string) {
+    const mediaHistory = await this.historyService.getHistoryById(
+      this.userSessions.get(clientId),
+    );
+    mediaHistory.finishedAt = new Date();
+    if (
+      Math.abs(
+        mediaHistory.startedAt.getTime() - mediaHistory.finishedAt.getTime(),
+      ) /
+        1000 <
+      60
+    ) {
+      await this.historyService.deleteMediaHistory(mediaHistory.id);
+    }
+    this.userSessions.delete(clientId);
   }
 }
