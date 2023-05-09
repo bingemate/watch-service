@@ -24,11 +24,14 @@ export class HistoryGateway
   ) {}
 
   async handleConnection(client: Socket) {
-    await this.createUserPeriod(
-      client.id,
-      client.handshake.headers['user-id'] as string,
-      client.handshake.query.mediaId as string,
-    );
+    const userId = client.handshake.headers['user-id'] as string;
+    const mediaId = client.handshake.query.mediaId as string;
+    if (!mediaId || !userId) {
+      client.emit('error');
+      client.disconnect();
+      return;
+    }
+    await this.createUserPeriod(client.id, userId, mediaId);
   }
 
   async handleDisconnect(client: Socket) {
