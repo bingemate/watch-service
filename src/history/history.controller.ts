@@ -39,17 +39,17 @@ export class HistoryController {
   }
 
   @ApiOperation({
-    description: 'Delete history entry of current user',
+    description: 'Delete history entry',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @ApiParam({ name: 'id', format: 'uuid' })
   @HttpCode(204)
-  @Delete('/:mediaId')
-  async deleteUsersMediaHistory(
-    @Param('mediaId') mediaId: string,
+  @Delete('/:id')
+  async deleteMediaHistoryById(
+    @Param('id') id: string,
     @Headers() headers,
   ): Promise<void> {
-    const userId = headers['user-id'];
-    return await this.historyService.deleteMediaHistory(mediaId, userId);
+    const userId = headers['user-id'] as string;
+    return await this.historyService.deleteMediaHistory(id, userId);
   }
 }

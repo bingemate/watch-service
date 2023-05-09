@@ -1,13 +1,22 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('media_history')
 export class MediaHistoryEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column('uuid')
   mediaId: string;
 
-  @PrimaryColumn('uuid')
+  @Column('uuid')
   userId: string;
 
   @Column('float')
   stoppedAt: number;
+
+  @Column()
+  startedAt: Date;
+
+  @Column({ nullable: true })
+  finishedAt?: Date;
 }
