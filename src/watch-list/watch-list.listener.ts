@@ -8,12 +8,12 @@ import { WatchListStatus } from './watch-list-status.enum';
 export class WatchListListener {
   constructor(private watchListService: WatchListService) {}
 
-  @OnEvent('history.updated')
+  @OnEvent('media.playing')
   async handleHistoryUpdatedEvent(payload: HistoryUpdatedEvent): Promise<void> {
-    let status = WatchListStatus.WATCHING;
-    if (payload.stoppedAt >= 0.95) {
-      status = WatchListStatus.FINISHED;
-    }
+    const status =
+      payload.stoppedAt < 0.95
+        ? WatchListStatus.WATCHING
+        : WatchListStatus.FINISHED;
     await this.watchListService.upsertWatchListItem({
       userId: payload.userId,
       mediaId: payload.mediaId,

@@ -1,5 +1,5 @@
 export enum HistoryUpdateTypeEnum {
-  UPDATE = 'UPDATE',
-  PAUSED = 'PAUSED',
-  UNPAUSED = 'UNPAUSED',
+  STARTED = 'STARTED',
+  PLAYING = 'PLAYING',
+  STOPPED = 'STOPPED',
 }

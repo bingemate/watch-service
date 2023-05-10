@@ -14,47 +14,19 @@ export class HistoryService {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
       .where('MediaHistoryEntity.userId=:userId', { userId })
+      .orderBy('MediaHistoryEntity.updatedAt', 'DESC')
       .getMany();
   }
 
-  async getHistoryById(id: string): Promise<MediaHistoryEntity> {
-    return await this.mediaHistoryRepository.findOne({ where: { id } });
-  }
-
-  async createMediaHistory(mediaHistoryEntity: {
+  async upsertMediaHistory(mediaHistory: {
+    stoppedAt: number;
     mediaId: string;
     userId: string;
-    stoppedAt: number;
-    startedAt: Date;
-  }): Promise<MediaHistoryEntity> {
-    return await this.mediaHistoryRepository.save(mediaHistoryEntity);
-  }
-
-  async updateMediaHistory(mediaHistoryEntity: {
-    id: string;
-    stoppedAt: number;
-    finishedAt?: Date;
   }): Promise<void> {
-    await this.mediaHistoryRepository.save(mediaHistoryEntity);
+    await this.mediaHistoryRepository.save(mediaHistory);
   }
 
-  async deleteMediaHistory(id: string, userId: string): Promise<void> {
-    await this.mediaHistoryRepository
-      .createQueryBuilder()
-      .where('MediaHistoryEntity.id=:id', { id })
-      .andWhere('MediaHistoryEntity.userId=:userId', { userId })
-      .delete()
-      .execute();
-  }
-
-  async getLastPeriod(
-    userId: string,
-    mediaId: string,
-  ): Promise<MediaHistoryEntity> {
-    return await this.mediaHistoryRepository
-      .createQueryBuilder()
-      .where('MediaHistoryEntity.userId=:userId', { userId })
-      .andWhere('MediaHistoryEntity.mediaId=:mediaId', { mediaId })
-      .getOne();
+  async deleteMediaHistory(mediaId: string, userId: string): Promise<void> {
+    await this.mediaHistoryRepository.delete({ mediaId, userId });
   }
 }

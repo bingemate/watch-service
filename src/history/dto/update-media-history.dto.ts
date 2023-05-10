@@ -3,7 +3,7 @@ import { HistoryUpdateTypeEnum } from '../history-update-type.enum';
 
 export class UpdateMediaHistoryDto {
   @ApiProperty({ enum: HistoryUpdateTypeEnum })
-  updateType: string;
+  watchStatus: HistoryUpdateTypeEnum;
   @ApiProperty()
   stoppedAt: number;
 }
