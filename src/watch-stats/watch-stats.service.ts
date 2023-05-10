@@ -28,4 +28,11 @@ export class WatchStatsService {
   async updateStatPeriod(watchStatsEntity: WatchStatsEntity) {
     await this.watchStatsRepository.save(watchStatsEntity);
   }
+
+  async getStatsByuserId(userId: string) {
+    return await this.watchStatsRepository
+      .createQueryBuilder()
+      .where('WatchStatsEntity.userId=:userId', { userId })
+      .getMany();
+  }
 }
