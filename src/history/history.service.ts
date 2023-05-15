@@ -14,7 +14,7 @@ export class HistoryService {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
       .where('MediaHistoryEntity.userId=:userId', { userId })
-      .orderBy('MediaHistoryEntity.updatedAt', 'DESC')
+      .orderBy('MediaHistoryEntity.viewedAt', 'DESC')
       .getMany();
   }
 

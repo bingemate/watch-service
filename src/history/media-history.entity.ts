@@ -12,5 +12,5 @@ export class MediaHistoryEntity {
   stoppedAt: number;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  viewedAt: Date;
 }
