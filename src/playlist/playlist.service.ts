@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlaylistItemEntity } from './playlist-item.entity';
 import { PlaylistEntity } from './playlist.entity';
+import { PlaylistTypeEnum } from './playlist-type.enum';
 
 @Injectable()
 export class PlaylistService {
@@ -14,8 +15,9 @@ export class PlaylistService {
   ) {}
 
   async createPlaylist(playlistCreation: {
-    userId: string;
     name: string;
+    type: PlaylistTypeEnum;
+    userId: string;
   }): Promise<string> {
     const playlist = await this.playlistRepository.save(playlistCreation);
     return playlist.id;

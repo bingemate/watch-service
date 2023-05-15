@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { PlaylistTypeEnum } from '../playlist-type.enum';
 
 export class PlaylistDto {
   @ApiProperty({ format: 'uuid' })
@@ -7,4 +8,6 @@ export class PlaylistDto {
   userId: string;
   @ApiProperty()
   name: string;
+  @ApiProperty({ enum: PlaylistTypeEnum })
+  type: string;
 }

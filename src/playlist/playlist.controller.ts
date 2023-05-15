@@ -23,6 +23,7 @@ import { PlaylistItemsDto } from './dto/playlist-items.dto';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { PlaylistsDto } from './dto/playlists.dto';
 import { PlaylistIdDto } from './dto/playlist-id.dto';
+import { PlaylistTypeEnum } from './playlist-type.enum';
 
 @ApiTags('/playlist')
 @Controller('/playlist')
@@ -41,6 +42,7 @@ export class PlaylistController {
     return {
       id: await this.playlistService.createPlaylist({
         name: playlistCreationDto.name,
+        type: PlaylistTypeEnum[playlistCreationDto.type],
         userId,
       }),
     };
@@ -58,6 +60,7 @@ export class PlaylistController {
         id: playlist.id,
         userId: playlist.userId,
         name: playlist.name,
+        type: playlist.type,
       })),
     };
   }
