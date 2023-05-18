@@ -16,4 +16,10 @@ export class PlaylistItemEntity {
 
   @Column()
   position: number;
+
+  @Column({ nullable: true })
+  season: number;
+
+  @Column({ nullable: true })
+  episode: number;
 }
