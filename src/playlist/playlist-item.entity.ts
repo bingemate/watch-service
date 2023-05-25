@@ -3,8 +3,8 @@ import { PlaylistEntity } from './playlist.entity';
 
 @Entity('playlist_item')
 export class PlaylistItemEntity {
-  @PrimaryColumn('uuid')
-  mediaId: string;
+  @PrimaryColumn()
+  mediaId: number;
 
   @PrimaryColumn('uuid')
   playlistId: string;

@@ -66,7 +66,7 @@ export class WatchListController {
   @Put('/:mediaId')
   async upsertWatchListItemStatus(
     @Headers() headers,
-    @Param('mediaId') mediaId: string,
+    @Param('mediaId') mediaId: number,
     @Body() status: WatchListStatusDto,
   ): Promise<void> {
     const userId = headers['user-id'];
@@ -84,7 +84,7 @@ export class WatchListController {
   @Delete('/:mediaId')
   async deleteWatchListItem(
     @Headers() headers,
-    @Param('mediaId') mediaId: string,
+    @Param('mediaId') mediaId: number,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.deleteWatchListItem(userId, mediaId);

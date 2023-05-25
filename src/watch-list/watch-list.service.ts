@@ -21,7 +21,7 @@ export class WatchListService {
     await this.watchListRepository.save(watchListItemEntity);
   }
 
-  async deleteWatchListItem(userId: string, mediaId: string) {
+  async deleteWatchListItem(userId: string, mediaId: number) {
     await this.watchListRepository.delete({ userId, mediaId });
   }
 }

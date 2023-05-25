@@ -1,5 +1,5 @@
 export interface HistoryUpdatedEvent {
-  mediaId: string;
+  mediaId: number;
   userId: string;
   stoppedAt: number;
   sessionId: string;
