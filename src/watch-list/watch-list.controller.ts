@@ -58,7 +58,7 @@ export class WatchListController {
   @ApiNotFoundResponse({
     description: 'Media not found',
   })
-  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
   @ApiBody({
     type: WatchListStatusDto,
   })
@@ -79,7 +79,7 @@ export class WatchListController {
 
   @ApiOperation({ description: 'Delete watch list item' })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
   @HttpCode(204)
   @Delete('/:mediaId')
   async deleteWatchListItem(
