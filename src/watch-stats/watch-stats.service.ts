@@ -12,7 +12,7 @@ export class WatchStatsService {
 
   async createStatsEntity(watchStatsEntity: {
     startedAt: Date;
-    mediaId: string;
+    mediaId: number;
     userId: string;
   }): Promise<WatchStatsEntity> {
     return await this.watchStatsRepository.save(watchStatsEntity);

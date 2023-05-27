@@ -8,8 +8,8 @@ export class WatchStatsEntity {
   @Column('uuid')
   userId: string;
 
-  @Column('uuid')
-  mediaId: string;
+  @Column()
+  mediaId: number;
 
   @Column()
   startedAt: Date;

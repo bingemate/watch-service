@@ -42,14 +42,14 @@ export class HistoryController {
     description: 'Delete history entry',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
   @HttpCode(204)
-  @Delete('/:id')
+  @Delete('/:mediaId')
   async deleteMediaHistoryById(
-    @Param('id') id: string,
+    @Param('mediaId') mediaId: number,
     @Headers() headers,
   ): Promise<void> {
     const userId = headers['user-id'] as string;
-    return await this.historyService.deleteMediaHistory(id, userId);
+    return await this.historyService.deleteMediaHistory(mediaId, userId);
   }
 }

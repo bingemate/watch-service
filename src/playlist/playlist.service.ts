@@ -38,7 +38,7 @@ export class PlaylistService {
       .getMany();
   }
 
-  async addMediaToPlaylist(playlistId: string, mediaId: string): Promise<void> {
+  async addMediaToPlaylist(playlistId: string, mediaId: number): Promise<void> {
     const maxPosition = await this.playlistItemRepository.maximum('position', {
       playlistId,
     });
@@ -51,7 +51,7 @@ export class PlaylistService {
 
   async updatePlaylist(playlistUpdate: {
     id: string;
-    medias: { mediaId: string }[];
+    medias: { mediaId: number }[];
   }): Promise<void> {
     const playlist = {
       id: playlistUpdate.id,

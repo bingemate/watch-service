@@ -77,6 +77,8 @@ export class PlaylistController {
     return {
       items: playlistItems.map((playlistItem) => ({
         mediaId: playlistItem.mediaId,
+        episode: playlistItem.episode,
+        season: playlistItem.season,
       })),
     };
   }
@@ -88,7 +90,7 @@ export class PlaylistController {
   @Patch('/:playlistId/:mediaId')
   async addMediaToPlaylist(
     @Param('playlistId') playlistId: string,
-    @Param('mediaId') mediaId: string,
+    @Param('mediaId') mediaId: number,
   ): Promise<void> {
     await this.playlistService.addMediaToPlaylist(playlistId, mediaId);
   }

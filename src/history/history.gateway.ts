@@ -26,7 +26,7 @@ export class HistoryGateway
     @MessageBody() historyUpdate: UpdateMediaHistoryDto,
   ): Promise<void> {
     const mediaHistory = {
-      mediaId: client.handshake.query.mediaId as string,
+      mediaId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
       stoppedAt: historyUpdate.stoppedAt,
     };
@@ -40,7 +40,7 @@ export class HistoryGateway
 
   handleConnection(client: Socket) {
     this.eventEmitter.emit(`media.started`, {
-      mediaId: client.handshake.query.mediaId as string,
+      mediaId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
       sessionId: client.id,
     });
@@ -48,7 +48,7 @@ export class HistoryGateway
 
   handleDisconnect(client: Socket) {
     this.eventEmitter.emit(`media.stopped`, {
-      mediaId: client.handshake.query.mediaId as string,
+      mediaId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
       sessionId: client.id,
     });

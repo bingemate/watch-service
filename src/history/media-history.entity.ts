@@ -2,8 +2,8 @@ import { Column, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('media_history')
 export class MediaHistoryEntity {
-  @PrimaryColumn('uuid')
-  mediaId: string;
+  @PrimaryColumn()
+  mediaId: number;
 
   @PrimaryColumn('uuid')
   userId: string;

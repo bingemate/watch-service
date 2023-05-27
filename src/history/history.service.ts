@@ -20,13 +20,13 @@ export class HistoryService {
 
   async upsertMediaHistory(mediaHistory: {
     stoppedAt: number;
-    mediaId: string;
+    mediaId: number;
     userId: string;
   }): Promise<void> {
     await this.mediaHistoryRepository.save(mediaHistory);
   }
 
-  async deleteMediaHistory(mediaId: string, userId: string): Promise<void> {
+  async deleteMediaHistory(mediaId: number, userId: string): Promise<void> {
     await this.mediaHistoryRepository.delete({ mediaId, userId });
   }
 }
