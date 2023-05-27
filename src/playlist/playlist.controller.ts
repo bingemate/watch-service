@@ -84,7 +84,7 @@ export class PlaylistController {
   }
 
   @ApiParam({ name: 'playlistId', format: 'uuid' })
-  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
   @ApiNoContentResponse()
   @HttpCode(204)
   @Patch('/:playlistId/:mediaId')

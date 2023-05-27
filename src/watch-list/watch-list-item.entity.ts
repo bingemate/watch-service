@@ -3,7 +3,7 @@ import { WatchListStatus } from './watch-list-status.enum';
 
 @Entity('watch_list_item')
 export class WatchListItemEntity {
-  @PrimaryColumn('uuid')
+  @PrimaryColumn()
   mediaId: number;
 
   @PrimaryColumn('uuid')

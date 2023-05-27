@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class WatchListItemDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty()
   mediaId: number;
   @ApiProperty({ format: 'uuid' })
   userId: string;
