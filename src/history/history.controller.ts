@@ -34,6 +34,7 @@ export class HistoryController {
         mediaId: history.mediaId,
         userId: userId,
         stoppedAt: history.stoppedAt,
+        viewedAt: history.viewedAt,
       })),
     };
   }

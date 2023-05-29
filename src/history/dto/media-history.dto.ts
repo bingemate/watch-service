@@ -7,4 +7,6 @@ export class MediaHistoryDto {
   userId: string;
   @ApiProperty()
   stoppedAt: number;
+  @ApiProperty()
+  viewedAt: Date;
 }
