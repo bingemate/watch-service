@@ -11,7 +11,7 @@ import { UpdateMediaHistoryDto } from './dto/update-media-history.dto';
 import { HistoryService } from './history.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-@WebSocketGateway({ namespace: 'watch', cors: true })
+@WebSocketGateway({ cors: true })
 export class HistoryGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
