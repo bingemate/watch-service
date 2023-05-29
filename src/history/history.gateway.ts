@@ -11,7 +11,7 @@ import { UpdateMediaHistoryDto } from './dto/update-media-history.dto';
 import { HistoryService } from './history.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-@WebSocketGateway({ namespace: 'watch' })
+@WebSocketGateway({ namespace: 'watch', cors: true })
 export class HistoryGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -39,8 +39,13 @@ export class HistoryGateway
   }
 
   handleConnection(client: Socket) {
+    const mediaId = parseInt(client.handshake.query.mediaId as string);
+    if (isNaN(mediaId)) {
+      client.disconnect();
+      return;
+    }
     this.eventEmitter.emit(`media.started`, {
-      mediaId: parseInt(client.handshake.query.mediaId as string),
+      mediaId,
       userId: client.handshake.headers['user-id'] as string,
       sessionId: client.id,
     });
