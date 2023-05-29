@@ -117,4 +117,16 @@ export class PlaylistController {
   async deletePlaylist(@Param('playlistId') playlistId: string): Promise<void> {
     await this.playlistService.deletePlaylist(playlistId);
   }
+
+  @ApiParam({ name: 'playlistId', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
+  @ApiNoContentResponse()
+  @HttpCode(204)
+  @Delete('/:playlistId/:mediaId')
+  async removeMediaFromPlaylist(
+    @Param('playlistId') playlistId: string,
+    @Param('mediaId') mediaId: number,
+  ): Promise<void> {
+    await this.playlistService.removeMedia(playlistId, mediaId);
+  }
 }

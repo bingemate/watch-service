@@ -67,4 +67,8 @@ export class PlaylistService {
   async deletePlaylist(playlistId: string): Promise<void> {
     await this.playlistRepository.delete(playlistId);
   }
+
+  async removeMedia(playlistId: string, mediaId: number) {
+    await this.playlistItemRepository.delete({ playlistId, mediaId });
+  }
 }
