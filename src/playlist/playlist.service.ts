@@ -30,6 +30,10 @@ export class PlaylistService {
       .getMany();
   }
 
+  async getPlaylistsById(id: string): Promise<PlaylistEntity> {
+    return this.playlistRepository.findOneBy({ id });
+  }
+
   async getPlaylistItems(playlistId: string): Promise<PlaylistItemEntity[]> {
     return this.playlistItemRepository
       .createQueryBuilder()

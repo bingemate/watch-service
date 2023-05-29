@@ -24,6 +24,7 @@ import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { PlaylistsDto } from './dto/playlists.dto';
 import { PlaylistIdDto } from './dto/playlist-id.dto';
 import { PlaylistTypeEnum } from './playlist-type.enum';
+import { PlaylistDto } from './dto/playlist.dto';
 
 @ApiTags('/playlist')
 @Controller('/playlist')
@@ -61,20 +62,26 @@ export class PlaylistController {
         userId: playlist.userId,
         name: playlist.name,
         type: playlist.type,
+        items: [],
       })),
     };
   }
 
   @ApiParam({ name: 'playlistId', format: 'uuid' })
-  @ApiOkResponse({ type: PlaylistItemsDto })
+  @ApiOkResponse({ type: PlaylistDto })
   @Get('/:playlistId')
-  async getPlaylistItems(
+  async getPlaylist(
     @Param('playlistId') playlistId: string,
-  ): Promise<PlaylistItemsDto> {
+  ): Promise<PlaylistDto> {
+    const playlist = await this.playlistService.getPlaylistsById(playlistId);
     const playlistItems = await this.playlistService.getPlaylistItems(
       playlistId,
     );
     return {
+      id: playlist.id,
+      type: playlist.type,
+      name: playlist.name,
+      userId: playlist.userId,
       items: playlistItems.map((playlistItem) => ({
         mediaId: playlistItem.mediaId,
         episode: playlistItem.episode,
