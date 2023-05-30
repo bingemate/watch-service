@@ -10,6 +10,9 @@ export class WatchStatsListener {
 
   @OnEvent('media.started')
   async handleMediaStartedEvent(payload: HistoryUpdatedEvent): Promise<void> {
+    if (this.sessions.has(payload.sessionId)) {
+      return;
+    }
     const statPeriod = await this.watchStatsService.createStatsEntity({
       mediaId: payload.mediaId,
       userId: payload.userId,
