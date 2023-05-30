@@ -40,7 +40,6 @@ export class HistoryGateway
 
   handleConnection(client: Socket) {
     const mediaId = parseInt(client.handshake.query.mediaId as string);
-    console.log(mediaId);
     if (isNaN(mediaId)) {
       client.disconnect();
       return;
