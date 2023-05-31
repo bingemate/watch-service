@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { PlaylistItemEntity } from './playlist-item.entity';
 import { PlaylistEntity } from './playlist.entity';
 import { PlaylistTypeEnum } from './playlist-type.enum';
+import { AddMediaDto } from './dto/add-media.dto';
 
 @Injectable()
 export class PlaylistService {
@@ -42,13 +43,18 @@ export class PlaylistService {
       .getMany();
   }
 
-  async addMediaToPlaylist(playlistId: string, mediaId: number): Promise<void> {
+  async addMediaToPlaylist(
+    playlistId: string,
+    addMediaDto: AddMediaDto,
+  ): Promise<void> {
     const maxPosition = await this.playlistItemRepository.maximum('position', {
       playlistId,
     });
     await this.playlistItemRepository.save({
       playlistId,
-      mediaId,
+      mediaId: addMediaDto.mediaId,
+      episode: addMediaDto.episode,
+      season: addMediaDto.season,
       position: maxPosition + 1,
     });
   }
