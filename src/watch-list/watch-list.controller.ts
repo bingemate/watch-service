@@ -23,6 +23,7 @@ import { WatchListDto } from './dto/watch-list.dto';
 import { CreateWatchlistDto } from './dto/create-watchlist.dto';
 import { UpdateWatchlistDto } from './dto/update-watchlist.dto';
 import { WatchListStatus } from './watch-list-status.enum';
+import { WatchListItemDto } from './dto/watch-list-item.dto';
 
 @ApiTags('/watch-list')
 @Controller('/watch-list')
@@ -52,6 +53,32 @@ export class WatchListController {
         viewedEpisodes: watchListItem.viewedEpisodes,
         mediaType: watchListItem.mediaType,
       })),
+    };
+  }
+
+  @ApiOperation({
+    description: 'Get a watchlist item by media id',
+  })
+  @ApiOkResponse({
+    type: WatchListItemDto,
+  })
+  @ApiParam({ name: 'mediaId' })
+  @Get('/:mediaId')
+  async getUserWatchlistById(
+    @Headers() headers,
+    @Param('mediaId') mediaId: number,
+  ): Promise<WatchListItemDto> {
+    const userId = headers['user-id'];
+    const watchListItem = await this.watchListService.getWatchListItemById(
+      userId,
+      mediaId,
+    );
+    return {
+      userId: watchListItem.userId,
+      mediaId: watchListItem.mediaId,
+      status: watchListItem.status,
+      viewedEpisodes: watchListItem.viewedEpisodes,
+      mediaType: watchListItem.mediaType,
     };
   }
 

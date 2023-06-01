@@ -18,6 +18,16 @@ export class WatchListService {
       .getMany();
   }
 
+  async getWatchListItemById(
+    userId: string,
+    mediaId: number,
+  ): Promise<WatchListItemEntity> {
+    return await this.watchListRepository
+      .createQueryBuilder()
+      .where({ userId, mediaId })
+      .getOne();
+  }
+
   async createWatchListItem(watchListItemEntity: WatchListItemEntity) {
     await this.watchListRepository.save(watchListItemEntity);
   }
