@@ -18,6 +18,6 @@ export class WatchListItemEntity {
   @Column({ enum: WatchListType })
   mediaType: WatchListType;
 
-  @Column()
+  @Column({ nullable: true })
   viewedEpisodes: number;
 }
