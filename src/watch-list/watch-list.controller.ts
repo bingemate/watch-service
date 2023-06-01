@@ -31,32 +31,6 @@ export class WatchListController {
   constructor(private watchListService: WatchListService) {}
 
   @ApiOperation({
-    description: 'Retrieve the watch list of a user',
-  })
-  @ApiOkResponse({
-    type: WatchListDto,
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found',
-  })
-  @ApiParam({ name: 'userId', format: 'uuid' })
-  @Get('/:userId')
-  async getUserWatchList(
-    @Param('userId') userId: string,
-  ): Promise<WatchListDto> {
-    const watchList = await this.watchListService.getWatchListByUserId(userId);
-    return {
-      watchListItems: watchList.map((watchListItem) => ({
-        userId: watchListItem.userId,
-        mediaId: watchListItem.mediaId,
-        status: watchListItem.status,
-        viewedEpisodes: watchListItem.viewedEpisodes,
-        mediaType: watchListItem.mediaType,
-      })),
-    };
-  }
-
-  @ApiOperation({
     description: 'Get a watchlist item by media id',
   })
   @ApiOkResponse({
@@ -79,6 +53,32 @@ export class WatchListController {
       status: watchListItem.status,
       viewedEpisodes: watchListItem.viewedEpisodes,
       mediaType: watchListItem.mediaType,
+    };
+  }
+
+  @ApiOperation({
+    description: 'Retrieve the watch list of a user',
+  })
+  @ApiOkResponse({
+    type: WatchListDto,
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+  })
+  @ApiParam({ name: 'userId', format: 'uuid' })
+  @Get('/:userId')
+  async getUserWatchList(
+    @Param('userId') userId: string,
+  ): Promise<WatchListDto> {
+    const watchList = await this.watchListService.getWatchListByUserId(userId);
+    return {
+      watchListItems: watchList.map((watchListItem) => ({
+        userId: watchListItem.userId,
+        mediaId: watchListItem.mediaId,
+        status: watchListItem.status,
+        viewedEpisodes: watchListItem.viewedEpisodes,
+        mediaType: watchListItem.mediaType,
+      })),
     };
   }
 
