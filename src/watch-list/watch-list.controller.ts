@@ -24,6 +24,7 @@ import { CreateWatchlistDto } from './dto/create-watchlist.dto';
 import { UpdateWatchlistDto } from './dto/update-watchlist.dto';
 import { WatchListStatus } from './watch-list-status.enum';
 import { WatchListItemDto } from './dto/watch-list-item.dto';
+import { WatchListItemEntity } from './watch-list-item.entity';
 
 @ApiTags('/watch-list')
 @Controller('/watch-list')
@@ -41,19 +42,9 @@ export class WatchListController {
   async getUserWatchlistById(
     @Headers() headers,
     @Param('mediaId') mediaId: number,
-  ): Promise<WatchListItemDto> {
+  ): Promise<WatchListItemEntity> {
     const userId = headers['user-id'];
-    const watchListItem = await this.watchListService.getWatchListItemById(
-      userId,
-      mediaId,
-    );
-    return {
-      userId: watchListItem.userId,
-      mediaId: watchListItem.mediaId,
-      status: watchListItem.status,
-      viewedEpisodes: watchListItem.viewedEpisodes,
-      mediaType: watchListItem.mediaType,
-    };
+    return await this.watchListService.getWatchListItemById(userId, mediaId);
   }
 
   @ApiOperation({
