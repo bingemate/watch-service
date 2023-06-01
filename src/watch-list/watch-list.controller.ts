@@ -18,9 +18,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { WatchListService } from './watch-list.service';
-import { WatchListStatus } from './watch-list-status.enum';
 import { WatchListDto } from './dto/watch-list.dto';
-import { WatchListStatusDto } from './dto/watch-list-status.dto';
+import { UpdateWatchListDto } from './dto/update-watch-list.dto';
 
 @ApiTags('/watch-list')
 @Controller('/watch-list')
@@ -47,6 +46,8 @@ export class WatchListController {
         userId: watchListItem.userId,
         mediaId: watchListItem.mediaId,
         status: watchListItem.status,
+        viewedEpisodes: watchListItem.viewedEpisodes,
+        mediaType: watchListItem.mediaType,
       })),
     };
   }
@@ -60,20 +61,22 @@ export class WatchListController {
   })
   @ApiParam({ name: 'mediaId' })
   @ApiBody({
-    type: WatchListStatusDto,
+    type: UpdateWatchListDto,
   })
   @HttpCode(204)
   @Put('/:mediaId')
   async upsertWatchListItemStatus(
     @Headers() headers,
     @Param('mediaId') mediaId: number,
-    @Body() status: WatchListStatusDto,
+    @Body() update: UpdateWatchListDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.upsertWatchListItem({
       userId,
       mediaId,
-      status: WatchListStatus[status.status],
+      status: update.status,
+      viewedEpisodes: update.viewedEpisodes,
+      mediaType: update.mediaType,
     });
   }
 
