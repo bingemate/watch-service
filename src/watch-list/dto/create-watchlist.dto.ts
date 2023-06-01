@@ -2,7 +2,7 @@ import { WatchListStatus } from '../watch-list-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { WatchListType } from '../watch-list-type.enum';
 
-export class UpdateWatchListDto {
+export class CreateWatchlistDto {
   @ApiProperty({ enum: WatchListStatus })
   status: WatchListStatus;
   @ApiProperty({ enum: WatchListType, required: false })
