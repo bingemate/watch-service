@@ -10,9 +10,7 @@ export class WatchListItemEntity {
   userId: string;
 
   @Column({
-    type: 'enum',
     enum: WatchListStatus,
-    enumName: 'watch_list_status',
   })
   status: WatchListStatus;
 }
