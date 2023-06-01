@@ -63,7 +63,7 @@ export class WatchListController {
     type: WatchListItemDto,
   })
   @ApiParam({ name: 'mediaId' })
-  @Get('/:mediaId')
+  @Get('/:mediaId/item')
   async getUserWatchlistById(
     @Headers() headers,
     @Param('mediaId') mediaId: number,
