@@ -11,6 +11,7 @@ export class WatchListItemEntity {
 
   @Column({
     enum: WatchListStatus,
+    nullable: true,
   })
   status: WatchListStatus;
 }
