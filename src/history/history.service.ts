@@ -14,16 +14,19 @@ export class HistoryService {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
       .where('MediaHistoryEntity.userId=:userId', { userId })
+      .orderBy('MediaHistoryEntity.viewedAt', 'DESC')
       .getMany();
   }
 
-  async upsertMediaHistory(
-    mediaHistoryEntity: MediaHistoryEntity,
-  ): Promise<void> {
-    await this.mediaHistoryRepository.save(mediaHistoryEntity);
+  async upsertMediaHistory(mediaHistory: {
+    stoppedAt: number;
+    mediaId: number;
+    userId: string;
+  }): Promise<void> {
+    await this.mediaHistoryRepository.save(mediaHistory);
   }
 
-  async deleteMediaHistory(mediaId: string, userId: string): Promise<void> {
+  async deleteMediaHistory(mediaId: number, userId: string): Promise<void> {
     await this.mediaHistoryRepository.delete({ mediaId, userId });
   }
 }

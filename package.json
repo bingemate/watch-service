@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.4.0",
     "@nestjs/swagger": "^6.3.0",
+    "@nestjs/terminus": "^9.2.2",
     "@nestjs/typeorm": "^9.0.1",
     "@nestjs/websockets": "^9.4.0",
     "pg": "^8.10.0",

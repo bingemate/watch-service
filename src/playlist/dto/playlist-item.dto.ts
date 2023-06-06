@@ -2,5 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class PlaylistItemDto {
   @ApiProperty()
-  mediaId: string;
+  mediaId: number;
+  @ApiProperty()
+  episode: number;
+  @ApiProperty()
+  season: number;
 }

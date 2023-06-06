@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlaylistItemEntity } from './playlist-item.entity';
 import { PlaylistEntity } from './playlist.entity';
+import { PlaylistTypeEnum } from './playlist-type.enum';
+import { AddMediaDto } from './dto/add-media.dto';
 
 @Injectable()
 export class PlaylistService {
@@ -14,8 +16,9 @@ export class PlaylistService {
   ) {}
 
   async createPlaylist(playlistCreation: {
-    userId: string;
     name: string;
+    type: PlaylistTypeEnum;
+    userId: string;
   }): Promise<string> {
     const playlist = await this.playlistRepository.save(playlistCreation);
     return playlist.id;
@@ -28,6 +31,10 @@ export class PlaylistService {
       .getMany();
   }
 
+  async getPlaylistsById(id: string): Promise<PlaylistEntity> {
+    return this.playlistRepository.findOneBy({ id });
+  }
+
   async getPlaylistItems(playlistId: string): Promise<PlaylistItemEntity[]> {
     return this.playlistItemRepository
       .createQueryBuilder()
@@ -36,20 +43,25 @@ export class PlaylistService {
       .getMany();
   }
 
-  async addMediaToPlaylist(playlistId: string, mediaId: string): Promise<void> {
+  async addMediaToPlaylist(
+    playlistId: string,
+    addMediaDto: AddMediaDto,
+  ): Promise<void> {
     const maxPosition = await this.playlistItemRepository.maximum('position', {
       playlistId,
     });
     await this.playlistItemRepository.save({
       playlistId,
-      mediaId,
+      mediaId: addMediaDto.mediaId,
+      episode: addMediaDto.episode,
+      season: addMediaDto.season,
       position: maxPosition + 1,
     });
   }
 
   async updatePlaylist(playlistUpdate: {
     id: string;
-    medias: { mediaId: string }[];
+    medias: { mediaId: number }[];
   }): Promise<void> {
     const playlist = {
       id: playlistUpdate.id,
@@ -64,5 +76,9 @@ export class PlaylistService {
 
   async deletePlaylist(playlistId: string): Promise<void> {
     await this.playlistRepository.delete(playlistId);
+  }
+
+  async removeMedia(playlistId: string, mediaId: number) {
+    await this.playlistItemRepository.delete({ playlistId, mediaId });
   }
 }

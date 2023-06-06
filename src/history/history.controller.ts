@@ -34,22 +34,23 @@ export class HistoryController {
         mediaId: history.mediaId,
         userId: userId,
         stoppedAt: history.stoppedAt,
+        viewedAt: history.viewedAt,
       })),
     };
   }
 
   @ApiOperation({
-    description: 'Delete history entry of current user',
+    description: 'Delete history entry',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'mediaId', format: 'uuid' })
+  @ApiParam({ name: 'mediaId' })
   @HttpCode(204)
   @Delete('/:mediaId')
-  async deleteUsersMediaHistory(
-    @Param('mediaId') mediaId: string,
+  async deleteMediaHistoryById(
+    @Param('mediaId') mediaId: number,
     @Headers() headers,
   ): Promise<void> {
-    const userId = headers['user-id'];
+    const userId = headers['user-id'] as string;
     return await this.historyService.deleteMediaHistory(mediaId, userId);
   }
 }

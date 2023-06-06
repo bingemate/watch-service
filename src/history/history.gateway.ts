@@ -1,17 +1,20 @@
 import {
   ConnectedSocket,
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { UpdateMediaHistoryDto } from './dto/update-media-history.dto';
 import { HistoryService } from './history.service';
-import { HistoryUpdateTypeEnum } from './history-update-type.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-@WebSocketGateway({ namespace: 'watch' })
-export class HistoryGateway {
+@WebSocketGateway({ cors: true })
+export class HistoryGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   constructor(
     private historyService: HistoryService,
     private eventEmitter: EventEmitter2,
@@ -23,18 +26,36 @@ export class HistoryGateway {
     @MessageBody() historyUpdate: UpdateMediaHistoryDto,
   ): Promise<void> {
     const mediaHistory = {
-      mediaId: historyUpdate.mediaId,
+      mediaId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
       stoppedAt: historyUpdate.stoppedAt,
     };
 
     await this.historyService.upsertMediaHistory(mediaHistory);
-    if (historyUpdate.updateType !== HistoryUpdateTypeEnum.UPDATE) {
-      this.eventEmitter.emit(`history.updated`, {
-        mediaId: historyUpdate.mediaId,
-        userId: client.handshake.headers['user-id'] as string,
-        stoppedAt: historyUpdate.stoppedAt,
-      });
+    this.eventEmitter.emit(
+      `media.${historyUpdate.watchStatus.toLowerCase()}`,
+      mediaHistory,
+    );
+  }
+
+  handleConnection(client: Socket) {
+    const mediaId = parseInt(client.handshake.query.mediaId as string);
+    if (isNaN(mediaId)) {
+      client.disconnect();
+      return;
     }
+    this.eventEmitter.emit(`media.started`, {
+      mediaId,
+      userId: client.handshake.headers['user-id'] as string,
+      sessionId: client.id,
+    });
+  }
+
+  handleDisconnect(client: Socket) {
+    this.eventEmitter.emit(`media.stopped`, {
+      mediaId: parseInt(client.handshake.query.mediaId as string),
+      userId: client.handshake.headers['user-id'] as string,
+      sessionId: client.id,
+    });
   }
 }

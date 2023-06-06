@@ -8,5 +8,4 @@ node_modules
 .editorconfig
 e2e
 *.md
-.env
-.env.example
+.env*

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WatchListItemEntity } from './watch-list-item.entity';
+import { WatchListStatus } from './watch-list-status.enum';
 
 @Injectable()
 export class WatchListService {
@@ -17,11 +18,35 @@ export class WatchListService {
       .getMany();
   }
 
-  async upsertWatchListItem(watchListItemEntity: WatchListItemEntity) {
+  async getWatchListItemById(
+    userId: string,
+    mediaId: number,
+  ): Promise<WatchListItemEntity> {
+    return await this.watchListRepository
+      .createQueryBuilder()
+      .where({ userId, mediaId })
+      .getOne();
+  }
+
+  async createWatchListItem(watchListItemEntity: WatchListItemEntity) {
     await this.watchListRepository.save(watchListItemEntity);
   }
 
-  async deleteWatchListItem(userId: string, mediaId: string) {
+  async updateWatchListItem(watchListItemEntity: WatchListItemEntity) {
+    await this.watchListRepository.save(watchListItemEntity);
+  }
+
+  async deleteWatchListItem(userId: string, mediaId: number) {
     await this.watchListRepository.delete({ userId, mediaId });
+  }
+
+  async updateWatchlist(
+    param: {
+      mediaId: number;
+      userId: string;
+    },
+    status: WatchListStatus,
+  ) {
+    await this.watchListRepository.update(param, { status });
   }
 }
