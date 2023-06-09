@@ -75,6 +75,7 @@ export class MoviePlaylistController {
     const playlistItems = await this.playlistService.getPlaylistItems(
       playlistId,
     );
+    console.log(playlistItems);
     return {
       id: playlist.id,
       name: playlist.name,
