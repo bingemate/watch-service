@@ -55,19 +55,19 @@ export class MoviePlaylistService {
     );
     await this.moviePlaylistItemRepository.save({
       playlistId,
-      mediaId: addMediaDto.movieId,
+      movieId: addMediaDto.movieId,
       position: maxPosition + 1,
     });
   }
 
   async updatePlaylist(playlistUpdate: {
     id: string;
-    medias: { mediaId: number }[];
+    medias: { movieId: number }[];
   }): Promise<void> {
     const playlist = {
       id: playlistUpdate.id,
       medias: playlistUpdate.medias.map((item, index) => ({
-        mediaId: item.mediaId,
+        movieId: item.movieId,
         playlistId: playlistUpdate.id,
         position: index,
       })),

@@ -109,7 +109,7 @@ export class EpisodePlaylistController {
     await this.playlistService.updatePlaylist({
       id: playlistId,
       medias: playlistItemsDto.items.map((item) => ({
-        mediaId: item.episodeId,
+        episodeId: item.episodeId,
       })),
     });
   }
@@ -123,14 +123,14 @@ export class EpisodePlaylistController {
   }
 
   @ApiParam({ name: 'playlistId', format: 'uuid' })
-  @ApiParam({ name: 'mediaId' })
+  @ApiParam({ name: 'episodeId' })
   @ApiNoContentResponse()
   @HttpCode(204)
-  @Delete('/:playlistId/:mediaId')
+  @Delete('/:playlistId/:episodeId')
   async removeMediaFromPlaylist(
     @Param('playlistId') playlistId: string,
-    @Param('mediaId') mediaId: number,
+    @Param('episodeId') episodeId: number,
   ): Promise<void> {
-    await this.playlistService.removeMedia(playlistId, mediaId);
+    await this.playlistService.removeMedia(playlistId, episodeId);
   }
 }
