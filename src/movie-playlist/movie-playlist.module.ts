@@ -7,7 +7,7 @@ import { MoviePlaylistService } from './movie-playlist.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([MoviePlaylistItemEntity, MoviePlaylistEntity]),
+    TypeOrmModule.forFeature([MoviePlaylistEntity, MoviePlaylistItemEntity]),
   ],
   providers: [MoviePlaylistService],
   controllers: [MoviePlaylistController],

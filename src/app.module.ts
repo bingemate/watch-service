@@ -7,6 +7,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { EpisodePlaylistModule } from './episode-playlist/episode-playlist.module';
 import { ServiceStatusModule } from './service-status/service-status.module';
 import { WatchStatsModule } from './watch-stats/watch-stats.module';
+import { MoviePlaylistModule } from './movie-playlist/movie-playlist.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -22,10 +24,12 @@ import { WatchStatsModule } from './watch-stats/watch-stats.module';
       synchronize: true,
       autoLoadEntities: true,
       logging: false,
+      namingStrategy: new SnakeNamingStrategy(),
     }),
     HistoryModule,
     WatchListModule,
     EpisodePlaylistModule,
+    MoviePlaylistModule,
     ServiceStatusModule,
     WatchStatsModule,
   ],

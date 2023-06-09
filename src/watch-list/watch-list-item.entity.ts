@@ -4,10 +4,10 @@ import { WatchListType } from './watch-list-type.enum';
 
 @Entity('watch_list_item')
 export class WatchListItemEntity {
-  @PrimaryColumn({ name: 'media_id' })
+  @PrimaryColumn()
   mediaId: number;
 
-  @PrimaryColumn({ type: 'uuid', name: 'user_id' })
+  @PrimaryColumn({ type: 'uuid' })
   userId: string;
 
   @Column({

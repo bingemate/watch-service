@@ -8,8 +8,8 @@ import { EpisodePlaylistController } from './episode-playlist.controller';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      EpisodePlaylistItemEntity,
       EpisodePlaylistEntity,
+      EpisodePlaylistItemEntity,
     ]),
   ],
   providers: [EpisodePlaylistService],
