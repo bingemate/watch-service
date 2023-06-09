@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HistoryModule } from './history/history.module';
 import { WatchListModule } from './watch-list/watch-list.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { PlaylistModule } from './playlist/playlist.module';
+import { EpisodePlaylistModule } from './episode-playlist/episode-playlist.module';
 import { ServiceStatusModule } from './service-status/service-status.module';
 import { WatchStatsModule } from './watch-stats/watch-stats.module';
 
@@ -25,7 +25,7 @@ import { WatchStatsModule } from './watch-stats/watch-stats.module';
     }),
     HistoryModule,
     WatchListModule,
-    PlaylistModule,
+    EpisodePlaylistModule,
     ServiceStatusModule,
     WatchStatsModule,
   ],
