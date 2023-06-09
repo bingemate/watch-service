@@ -75,15 +75,6 @@ export class MoviePlaylistController {
     const playlistItems = await this.playlistService.getPlaylistItems(
       playlistId,
     );
-    console.log(playlistItems);
-    console.log({
-      id: playlist.id,
-      name: playlist.name,
-      userId: playlist.userId,
-      items: playlistItems.map((playlistItem) => ({
-        movieId: playlistItem.movieId,
-      })),
-    });
     return {
       id: playlist.id,
       name: playlist.name,
