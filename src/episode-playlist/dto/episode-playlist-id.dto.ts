@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PlaylistIdDto {
+export class EpisodePlaylistIdDto {
   @ApiProperty({ format: 'uuid' })
   id: string;
 }
