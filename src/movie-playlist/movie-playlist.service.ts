@@ -25,7 +25,7 @@ export class MoviePlaylistService {
   async getPlaylistsByUserId(userId: string): Promise<MoviePlaylistEntity[]> {
     return this.moviePlaylistRepository
       .createQueryBuilder()
-      .where('PlaylistEntity.userId=:userId', { userId })
+      .where('MoviePlaylistEntity.userId=:userId', { userId })
       .getMany();
   }
 
@@ -38,8 +38,8 @@ export class MoviePlaylistService {
   ): Promise<MoviePlaylistItemEntity[]> {
     return this.moviePlaylistItemRepository
       .createQueryBuilder()
-      .where('PlaylistItemEntity.playlistId=:playlistId', { playlistId })
-      .orderBy('PlaylistItemEntity.position', 'ASC')
+      .where('MoviePlaylistItemEntity.playlistId=:playlistId', { playlistId })
+      .orderBy('MoviePlaylistItemEntity.position', 'ASC')
       .getMany();
   }
 

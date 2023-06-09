@@ -27,7 +27,7 @@ export class EpisodePlaylistService {
   async getPlaylistsByUserId(userId: string): Promise<EpisodePlaylistEntity[]> {
     return this.episodePlaylistRepository
       .createQueryBuilder()
-      .where('PlaylistEntity.userId=:userId', { userId })
+      .where('EpisodePlaylistEntity.userId=:userId', { userId })
       .getMany();
   }
 
@@ -40,8 +40,8 @@ export class EpisodePlaylistService {
   ): Promise<EpisodePlaylistItemEntity[]> {
     return this.episodePlaylistItemRepository
       .createQueryBuilder()
-      .where('PlaylistItemEntity.playlistId=:playlistId', { playlistId })
-      .orderBy('PlaylistItemEntity.position', 'ASC')
+      .where('EpisodePlaylistItemEntity.playlistId=:playlistId', { playlistId })
+      .orderBy('EpisodePlaylistItemEntity.position', 'ASC')
       .getMany();
   }
 
