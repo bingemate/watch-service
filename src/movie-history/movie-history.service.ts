@@ -23,6 +23,7 @@ export class MovieHistoryService {
     movieId: number;
     userId: string;
   }): Promise<void> {
+    console.log(mediaHistory);
     await this.mediaHistoryRepository.save(mediaHistory);
   }
 

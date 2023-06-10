@@ -14,7 +14,6 @@ export class MovieWatchStatsListener {
       if (this.sessions.has(payload.sessionId)) {
         return;
       }
-      console.log(payload);
       const statPeriod = await this.watchStatsService.createStatsEntity({
         movieId: payload.mediaId,
         userId: payload.userId,
