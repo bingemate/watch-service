@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { MediaHistoryEntity } from './media-history.entity';
-import { HistoryService } from './history.service';
-import { HistoryController } from './history.controller';
 import { HistoryGateway } from './history.gateway';
+import { MovieHistoryModule } from '../movie-history/movie-history.module';
+import { EpisodeHistoryModule } from '../episode-history/episode-history.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MediaHistoryEntity])],
-  providers: [HistoryService, HistoryGateway],
-  controllers: [HistoryController],
-  exports: [HistoryService],
+  imports: [MovieHistoryModule, EpisodeHistoryModule],
+  providers: [HistoryGateway],
+  controllers: [],
+  exports: [],
 })
 export class HistoryModule {}

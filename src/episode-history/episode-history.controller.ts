@@ -6,7 +6,7 @@ import {
   HttpCode,
   Param,
 } from '@nestjs/common';
-import { HistoryDto } from './dto/history.dto';
+import { EpisodeHistoryListDto } from './dto/episode-history-list.dto';
 import {
   ApiNoContentResponse,
   ApiOkResponse,
@@ -14,24 +14,24 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { HistoryService } from './history.service';
+import { EpisodeHistoryService } from './episode-history.service';
 
-@ApiTags('/history')
-@Controller({ path: '/history' })
-export class HistoryController {
-  constructor(private historyService: HistoryService) {}
+@ApiTags('/episode-history')
+@Controller({ path: '/episode-history' })
+export class EpisodeHistoryController {
+  constructor(private historyService: EpisodeHistoryService) {}
 
   @ApiOperation({ description: "Get current user's history" })
   @ApiOkResponse({
-    type: HistoryDto,
+    type: EpisodeHistoryListDto,
   })
   @Get()
-  async getUsersHistory(@Headers() headers): Promise<HistoryDto> {
+  async getUsersHistory(@Headers() headers): Promise<EpisodeHistoryListDto> {
     const userId = headers['user-id'];
     const mediasHistory = await this.historyService.getHistoryByUserId(userId);
     return {
       medias: mediasHistory.map((history) => ({
-        mediaId: history.mediaId,
+        mediaId: history.episodeId,
         userId: userId,
         stoppedAt: history.stoppedAt,
         viewedAt: history.viewedAt,

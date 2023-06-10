@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { WatchStatsEntity } from './watch-stats.entity';
+import { MovieWatchStatsEntity } from './movie-watch-stats.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class WatchStatsService {
+export class MovieWatchStatsService {
   constructor(
-    @InjectRepository(WatchStatsEntity)
-    private readonly watchStatsRepository: Repository<WatchStatsEntity>,
+    @InjectRepository(MovieWatchStatsEntity)
+    private readonly watchStatsRepository: Repository<MovieWatchStatsEntity>,
   ) {}
 
   async createStatsEntity(watchStatsEntity: {
     startedAt: Date;
-    mediaId: number;
+    movieId: number;
     userId: string;
-  }): Promise<WatchStatsEntity> {
+  }): Promise<MovieWatchStatsEntity> {
     return await this.watchStatsRepository.save(watchStatsEntity);
   }
 
@@ -25,7 +25,7 @@ export class WatchStatsService {
     await this.watchStatsRepository.delete(id);
   }
 
-  async updateStatPeriod(watchStatsEntity: WatchStatsEntity) {
+  async updateStatPeriod(watchStatsEntity: MovieWatchStatsEntity) {
     await this.watchStatsRepository.save(watchStatsEntity);
   }
 

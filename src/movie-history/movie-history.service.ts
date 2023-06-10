@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { MediaHistoryEntity } from './media-history.entity';
+import { MovieMediaHistoryEntity } from './movie-media-history.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class HistoryService {
+export class MovieHistoryService {
   constructor(
-    @InjectRepository(MediaHistoryEntity)
-    private readonly mediaHistoryRepository: Repository<MediaHistoryEntity>,
+    @InjectRepository(MovieMediaHistoryEntity)
+    private readonly mediaHistoryRepository: Repository<MovieMediaHistoryEntity>,
   ) {}
 
-  async getHistoryByUserId(userId: string): Promise<MediaHistoryEntity[]> {
+  async getHistoryByUserId(userId: string): Promise<MovieMediaHistoryEntity[]> {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
       .where('MediaHistoryEntity.userId=:userId', { userId })
@@ -20,13 +20,13 @@ export class HistoryService {
 
   async upsertMediaHistory(mediaHistory: {
     stoppedAt: number;
-    mediaId: number;
+    movieId: number;
     userId: string;
   }): Promise<void> {
     await this.mediaHistoryRepository.save(mediaHistory);
   }
 
   async deleteMediaHistory(mediaId: number, userId: string): Promise<void> {
-    await this.mediaHistoryRepository.delete({ mediaId, userId });
+    await this.mediaHistoryRepository.delete({ movieId: mediaId, userId });
   }
 }

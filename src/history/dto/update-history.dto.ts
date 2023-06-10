@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { HistoryUpdateTypeEnum } from '../history-update-type.enum';
 
-export class UpdateMediaHistoryDto {
+export class UpdateHistoryDto {
   @ApiProperty({ enum: HistoryUpdateTypeEnum })
   watchStatus: HistoryUpdateTypeEnum;
   @ApiProperty()

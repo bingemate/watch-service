@@ -1,27 +1,27 @@
-import { HistoryUpdatedEvent } from '../history/events/history-updated.event';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
-import { WatchStatsService } from './watch-stats.service';
+import { MovieWatchStatsService } from './movie-watch-stats.service';
+import { HistoryUpdatedEvent } from '../history/events/history-updated.event';
 
 @Injectable()
-export class WatchStatsListener {
+export class MovieWatchStatsListener {
   private readonly sessions = new Map<string, string>();
-  constructor(private watchStatsService: WatchStatsService) {}
+  constructor(private watchStatsService: MovieWatchStatsService) {}
 
-  @OnEvent('media.started')
+  @OnEvent('movie.started')
   async handleMediaStartedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     if (this.sessions.has(payload.sessionId)) {
       return;
     }
     const statPeriod = await this.watchStatsService.createStatsEntity({
-      mediaId: payload.mediaId,
+      movieId: payload.mediaId,
       userId: payload.userId,
       startedAt: new Date(),
     });
     this.sessions.set(payload.sessionId, statPeriod.id);
   }
 
-  @OnEvent('media.stopped')
+  @OnEvent('movie.stopped')
   async handleMediaStoppedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     const mediaHistory = await this.watchStatsService.getStatById(
       this.sessions.get(payload.sessionId),

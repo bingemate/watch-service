@@ -5,23 +5,23 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { WatchStatsService } from './watch-stats.service';
-import { WatchStatsEntity } from './watch-stats.entity';
+import { MovieWatchStatsService } from './movie-watch-stats.service';
+import { MovieWatchStatsEntity } from './movie-watch-stats.entity';
 
-@ApiTags('/stats')
-@Controller({ path: '/stats' })
-export class WatchStatsController {
-  constructor(private watchStatsService: WatchStatsService) {}
+@ApiTags('/movie-stats')
+@Controller({ path: '/movie-stats' })
+export class MovieWatchStatsController {
+  constructor(private watchStatsService: MovieWatchStatsService) {}
 
   @ApiOperation({
     description: "Get user's stats",
   })
-  @ApiOkResponse({ type: [WatchStatsEntity] })
+  @ApiOkResponse({ type: [MovieWatchStatsEntity] })
   @ApiParam({ name: 'userId', format: 'uuid' })
   @Get('/:userId')
   async getUserStats(
     @Param('userId') userId: string,
-  ): Promise<WatchStatsEntity[]> {
+  ): Promise<MovieWatchStatsEntity[]> {
     return await this.watchStatsService.getStatsByuserId(userId);
   }
 }

@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('watch_stats')
-export class WatchStatsEntity {
+@Entity('episode_watch_stats')
+export class EpisodeWatchStatsEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -9,7 +9,7 @@ export class WatchStatsEntity {
   userId: string;
 
   @Column()
-  mediaId: number;
+  episodeId: number;
 
   @Column()
   startedAt: Date;
