@@ -16,8 +16,8 @@ import {
 } from '@nestjs/swagger';
 import { MovieHistoryService } from './movie-history.service';
 
-@ApiTags('/episode-history')
-@Controller({ path: '/episode-history' })
+@ApiTags('/movie-history')
+@Controller({ path: '/movie-history' })
 export class MovieHistoryController {
   constructor(private historyService: MovieHistoryService) {}
 
