@@ -32,7 +32,7 @@ export class MovieWatchStatsService {
   async getStatsByuserId(userId: string) {
     return await this.watchStatsRepository
       .createQueryBuilder()
-      .where('WatchStatsEntity.userId=:userId', { userId })
+      .where('MovieWatchStatsEntity.userId=:userId', { userId })
       .getMany();
   }
 }

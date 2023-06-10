@@ -32,7 +32,7 @@ export class EpisodeWatchStatsService {
   async getStatsByuserId(userId: string) {
     return await this.watchStatsRepository
       .createQueryBuilder()
-      .where('WatchStatsEntity.userId=:userId', { userId })
+      .where('EpisodeWatchStatsEntity.userId=:userId', { userId })
       .getMany();
   }
 }

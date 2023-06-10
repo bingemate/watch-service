@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { EpisodeMediaHistoryEntity } from './episode-media-history.entity';
+import { EpisodeHistoryEntity } from './episode-history.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class EpisodeHistoryService {
   constructor(
-    @InjectRepository(EpisodeMediaHistoryEntity)
-    private readonly mediaHistoryRepository: Repository<EpisodeMediaHistoryEntity>,
+    @InjectRepository(EpisodeHistoryEntity)
+    private readonly mediaHistoryRepository: Repository<EpisodeHistoryEntity>,
   ) {}
 
-  async getHistoryByUserId(
-    userId: string,
-  ): Promise<EpisodeMediaHistoryEntity[]> {
+  async getHistoryByUserId(userId: string): Promise<EpisodeHistoryEntity[]> {
     return await this.mediaHistoryRepository
       .createQueryBuilder()
-      .where('MediaHistoryEntity.userId=:userId', { userId })
-      .orderBy('MediaHistoryEntity.viewedAt', 'DESC')
+      .where('EpisodeHistoryEntity.userId=:userId', { userId })
+      .orderBy('EpisodeHistoryEntity.viewedAt', 'DESC')
       .getMany();
   }
 

@@ -1,9 +1,9 @@
 import { Column, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('movie_media_history')
-export class MovieMediaHistoryEntity {
+@Entity('episode_history')
+export class EpisodeHistoryEntity {
   @PrimaryColumn()
-  movieId: number;
+  episodeId: number;
 
   @PrimaryColumn('uuid')
   userId: string;
