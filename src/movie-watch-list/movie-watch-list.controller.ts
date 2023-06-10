@@ -67,7 +67,6 @@ export class MovieWatchListController {
         userId: watchListItem.userId,
         episodeId: watchListItem.episodeId,
         status: watchListItem.status,
-        viewedEpisodes: watchListItem.viewedEpisodes,
       })),
     };
   }
@@ -95,7 +94,6 @@ export class MovieWatchListController {
       userId,
       episodeId: episodeId,
       status: MovieWatchListStatus[update.status],
-      viewedEpisodes: update.viewedEpisodes,
     });
   }
 

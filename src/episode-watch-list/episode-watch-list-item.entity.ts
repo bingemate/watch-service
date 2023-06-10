@@ -9,12 +9,9 @@ export class EpisodeWatchListItemEntity {
   @PrimaryColumn({ type: 'uuid' })
   userId: string;
 
-  @Column({
-    enum: EpisodeWatchListStatus,
-    nullable: true,
-  })
+  @Column({ enum: EpisodeWatchListStatus })
   status: EpisodeWatchListStatus;
 
-  @Column({ nullable: true })
+  @Column()
   viewedEpisodes: number;
 }

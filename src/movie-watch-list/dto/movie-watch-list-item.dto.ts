@@ -6,8 +6,6 @@ export class MovieWatchListItemDto {
   episodeId: number;
   @ApiProperty({ format: 'uuid' })
   userId: string;
-  @ApiProperty()
-  viewedEpisodes: number;
   @ApiProperty({ enum: MovieWatchListStatus })
   status: MovieWatchListStatus;
 }

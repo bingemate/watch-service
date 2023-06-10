@@ -88,14 +88,14 @@ export class EpisodeWatchListController {
   async createWatchListItemStatus(
     @Headers() headers,
     @Param('episodeId') episodeId: number,
-    @Body() update: AddEpisodeWatchlistItemDto,
+    @Body() create: AddEpisodeWatchlistItemDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.createWatchListItem({
       userId,
       episodeId: episodeId,
-      status: EpisodeWatchListStatus[update.status],
-      viewedEpisodes: update.viewedEpisodes,
+      status: EpisodeWatchListStatus[create.status],
+      viewedEpisodes: create.viewedEpisodes,
     });
   }
 
