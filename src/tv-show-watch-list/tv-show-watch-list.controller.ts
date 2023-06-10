@@ -18,18 +18,18 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { EpisodeWatchListService } from './episode-watch-list.service';
+import { TvShowWatchListService } from './tv-show-watch-list.service';
 import { EpisodeWatchListDto } from './dto/episode-watch-list.dto';
 import { AddEpisodeWatchlistItemDto } from './dto/add-episode-watchlist-item.dto';
 import { UpdateEpisodeWatchlistItemDto } from './dto/update-episode-watchlist-item.dto';
 import { EpisodeWatchListItemDto } from './dto/episode-watch-list-item.dto';
-import { EpisodeWatchListItemEntity } from './episode-watch-list-item.entity';
-import { EpisodeWatchListStatus } from './episode-watch-list-status.enum';
+import { TvShowWatchListItemEntity } from './tv-show-watch-list-item.entity';
+import { TvShowWatchListStatus } from './tv-show-watch-list-status.enum';
 
-@ApiTags('/episode-watchlist')
-@Controller('/episode-watchlist')
-export class EpisodeWatchListController {
-  constructor(private watchListService: EpisodeWatchListService) {}
+@ApiTags('/tv-show-watchlist')
+@Controller('/tv-show-watchlist')
+export class TvShowWatchListController {
+  constructor(private watchListService: TvShowWatchListService) {}
 
   @ApiOperation({
     description: 'Get a watchlist item by media id',
@@ -37,14 +37,14 @@ export class EpisodeWatchListController {
   @ApiOkResponse({
     type: EpisodeWatchListItemDto,
   })
-  @ApiParam({ name: 'episodeId' })
-  @Get('/:episodeId/item')
+  @ApiParam({ name: 'tvShowId' })
+  @Get('/:tvShowId/item')
   async getUserWatchlistById(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
-  ): Promise<EpisodeWatchListItemEntity> {
+    @Param('tvShowId') tvShowId: number,
+  ): Promise<TvShowWatchListItemEntity> {
     const userId = headers['user-id'];
-    return await this.watchListService.getWatchListItemById(userId, episodeId);
+    return await this.watchListService.getWatchListItemById(userId, tvShowId);
   }
 
   @ApiOperation({
@@ -65,7 +65,7 @@ export class EpisodeWatchListController {
     return {
       watchListItems: watchList.map((watchListItem) => ({
         userId: watchListItem.userId,
-        episodeId: watchListItem.episodeId,
+        tvShowId: watchListItem.tvShowId,
         status: watchListItem.status,
         viewedEpisodes: watchListItem.viewedEpisodes,
       })),
@@ -79,22 +79,22 @@ export class EpisodeWatchListController {
   @ApiNotFoundResponse({
     description: 'Media not found',
   })
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'tvShowId' })
   @ApiBody({
     type: AddEpisodeWatchlistItemDto,
   })
   @HttpCode(204)
-  @Post('/:episodeId')
+  @Post('/:tvShowId')
   async createWatchListItemStatus(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('tvShowId') tvShowId: number,
     @Body() create: AddEpisodeWatchlistItemDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.createWatchListItem({
       userId,
-      episodeId: episodeId,
-      status: EpisodeWatchListStatus[create.status],
+      tvShowId: tvShowId,
+      status: TvShowWatchListStatus[create.status],
       viewedEpisodes: create.viewedEpisodes,
     });
   }
@@ -103,22 +103,22 @@ export class EpisodeWatchListController {
     description: 'Update watchlist entry status',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'tvShowId' })
   @ApiBody({
     type: UpdateEpisodeWatchlistItemDto,
   })
   @HttpCode(204)
-  @Put('/:episodeId')
+  @Put('/:tvShowId')
   async updateWatchListItemStatus(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('tvShowId') tvShowId: number,
     @Body() update: UpdateEpisodeWatchlistItemDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.updateWatchListItem(
       {
         userId,
-        episodeId,
+        tvShowId,
       },
       update.status,
     );
@@ -126,14 +126,14 @@ export class EpisodeWatchListController {
 
   @ApiOperation({ description: 'Delete watch list item' })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'tvShowId' })
   @HttpCode(204)
-  @Delete('/:episodeId')
+  @Delete('/:tvShowId')
   async deleteWatchListItem(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('tvShowId') tvShowId: number,
   ): Promise<void> {
     const userId = headers['user-id'];
-    await this.watchListService.deleteWatchListItem(userId, episodeId);
+    await this.watchListService.deleteWatchListItem(userId, tvShowId);
   }
 }
