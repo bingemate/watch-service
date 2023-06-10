@@ -27,7 +27,7 @@ export class HistoryGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
-    const type = parseInt(client.handshake.query.type as string);
+    const type = client.handshake.query.type;
     const mediaHistory = {
       episodeId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
@@ -43,7 +43,7 @@ export class HistoryGateway
 
   handleConnection(client: Socket) {
     const mediaId = parseInt(client.handshake.query.mediaId as string);
-    const type = parseInt(client.handshake.query.type as string);
+    const type = client.handshake.query.type;
     if (isNaN(mediaId) && !type) {
       client.disconnect();
       return;
@@ -56,7 +56,7 @@ export class HistoryGateway
   }
 
   handleDisconnect(client: Socket) {
-    const type = parseInt(client.handshake.query.type as string);
+    const type = client.handshake.query.type;
     this.eventEmitter.emit(`${type}.stopped`, {
       mediaId: parseInt(client.handshake.query.mediaId as string),
       userId: client.handshake.headers['user-id'] as string,
