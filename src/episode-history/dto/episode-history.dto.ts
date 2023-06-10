@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class EpisodeHistoryDto {
   @ApiProperty()
-  mediaId: number;
+  episodeId: number;
   @ApiProperty({ format: 'uuid' })
   userId: string;
   @ApiProperty()

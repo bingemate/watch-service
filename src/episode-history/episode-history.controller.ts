@@ -31,7 +31,7 @@ export class EpisodeHistoryController {
     const mediasHistory = await this.historyService.getHistoryByUserId(userId);
     return {
       medias: mediasHistory.map((history) => ({
-        mediaId: history.episodeId,
+        episodeId: history.episodeId,
         userId: userId,
         stoppedAt: history.stoppedAt,
         viewedAt: history.viewedAt,

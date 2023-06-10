@@ -31,7 +31,7 @@ export class MovieHistoryController {
     const mediasHistory = await this.historyService.getHistoryByUserId(userId);
     return {
       medias: mediasHistory.map((history) => ({
-        mediaId: history.movieId,
+        movieId: history.movieId,
         userId: userId,
         stoppedAt: history.stoppedAt,
         viewedAt: history.viewedAt,
