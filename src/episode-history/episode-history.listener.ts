@@ -9,10 +9,14 @@ export class EpisodeWatchStatsListener {
 
   @OnEvent('episode.playing')
   async handleMediaPlayingEvent(payload: HistoryUpdatedEvent): Promise<void> {
-    await this.episodeHistoryService.upsertMediaHistory({
-      episodeId: payload.mediaId,
-      userId: payload.userId,
-      stoppedAt: payload.stoppedAt,
-    });
+    try {
+      await this.episodeHistoryService.upsertMediaHistory({
+        episodeId: payload.mediaId,
+        userId: payload.userId,
+        stoppedAt: payload.stoppedAt,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
