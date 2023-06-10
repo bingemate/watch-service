@@ -3,7 +3,7 @@ import { MovieWatchListStatus } from '../movie-watch-list-status.enum';
 
 export class MovieWatchListItemDto {
   @ApiProperty()
-  episodeId: number;
+  movieId: number;
   @ApiProperty({ format: 'uuid' })
   userId: string;
   @ApiProperty({ enum: MovieWatchListStatus })

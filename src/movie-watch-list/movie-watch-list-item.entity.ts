@@ -4,7 +4,7 @@ import { MovieWatchListStatus } from './movie-watch-list-status.enum';
 @Entity('movie_watch_list_item')
 export class MovieWatchListItemEntity {
   @PrimaryColumn()
-  episodeId: number;
+  movieId: number;
 
   @PrimaryColumn({ type: 'uuid' })
   userId: string;

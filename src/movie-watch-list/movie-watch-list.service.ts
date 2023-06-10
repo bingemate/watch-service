@@ -22,11 +22,11 @@ export class MovieWatchListService {
 
   async getWatchListItemById(
     userId: string,
-    episodeId: number,
+    movieId: number,
   ): Promise<MovieWatchListItemEntity> {
     return await this.watchListRepository
       .createQueryBuilder()
-      .where({ userId, episodeId })
+      .where({ userId, movieId })
       .getOne();
   }
 
@@ -34,13 +34,13 @@ export class MovieWatchListService {
     await this.watchListRepository.save(watchListItemEntity);
   }
 
-  async deleteWatchListItem(userId: string, episodeId: number) {
-    await this.watchListRepository.delete({ userId, episodeId });
+  async deleteWatchListItem(userId: string, movieId: number) {
+    await this.watchListRepository.delete({ userId, movieId: movieId });
   }
 
   async updateWatchListItem(
     param: {
-      episodeId: number;
+      movieId: number;
       userId: string;
     },
     status: MovieWatchListStatus,

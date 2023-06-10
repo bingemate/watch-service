@@ -37,14 +37,14 @@ export class MovieWatchListController {
   @ApiOkResponse({
     type: MovieWatchListItemDto,
   })
-  @ApiParam({ name: 'episodeId' })
-  @Get('/:episodeId/item')
+  @ApiParam({ name: 'movieId' })
+  @Get('/:movieId/item')
   async getUserWatchlistById(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('movieId') movieId: number,
   ): Promise<MovieWatchListItemEntity> {
     const userId = headers['user-id'];
-    return await this.watchListService.getWatchListItemById(userId, episodeId);
+    return await this.watchListService.getWatchListItemById(userId, movieId);
   }
 
   @ApiOperation({
@@ -65,7 +65,7 @@ export class MovieWatchListController {
     return {
       watchListItems: watchList.map((watchListItem) => ({
         userId: watchListItem.userId,
-        episodeId: watchListItem.episodeId,
+        movieId: watchListItem.movieId,
         status: watchListItem.status,
       })),
     };
@@ -78,21 +78,21 @@ export class MovieWatchListController {
   @ApiNotFoundResponse({
     description: 'Media not found',
   })
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'movieId' })
   @ApiBody({
     type: AddMovieWatchlistItemDto,
   })
   @HttpCode(204)
-  @Post('/:episodeId')
+  @Post('/:movieId')
   async createWatchListItemStatus(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('movieId') movieId: number,
     @Body() update: AddMovieWatchlistItemDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.createWatchListItem({
       userId,
-      episodeId: episodeId,
+      movieId: movieId,
       status: MovieWatchListStatus[update.status],
     });
   }
@@ -101,22 +101,22 @@ export class MovieWatchListController {
     description: 'Update watchlist entry status',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'movieId' })
   @ApiBody({
     type: UpdateMovieWatchlistItemDto,
   })
   @HttpCode(204)
-  @Put('/:episodeId')
+  @Put('/:movieId')
   async updateWatchListItemStatus(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('movieId') movieId: number,
     @Body() update: UpdateMovieWatchlistItemDto,
   ): Promise<void> {
     const userId = headers['user-id'];
     await this.watchListService.updateWatchListItem(
       {
         userId,
-        episodeId,
+        movieId,
       },
       update.status,
     );
@@ -124,14 +124,14 @@ export class MovieWatchListController {
 
   @ApiOperation({ description: 'Delete watch list item' })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'episodeId' })
+  @ApiParam({ name: 'movieId' })
   @HttpCode(204)
-  @Delete('/:episodeId')
+  @Delete('/:movieId')
   async deleteWatchListItem(
     @Headers() headers,
-    @Param('episodeId') episodeId: number,
+    @Param('movieId') movieId: number,
   ): Promise<void> {
     const userId = headers['user-id'];
-    await this.watchListService.deleteWatchListItem(userId, episodeId);
+    await this.watchListService.deleteWatchListItem(userId, movieId);
   }
 }
