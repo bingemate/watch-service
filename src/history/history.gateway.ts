@@ -30,12 +30,10 @@ export class HistoryGateway
     try {
       const type = client.handshake.query.type;
       const mediaHistory = {
-        episodeId: parseInt(client.handshake.query.mediaId as string),
+        mediaId: parseInt(client.handshake.query.mediaId as string),
         userId: client.handshake.headers['user-id'] as string,
         stoppedAt: historyUpdate.stoppedAt,
       };
-
-      await this.episodeHistoryService.upsertMediaHistory(mediaHistory);
       this.eventEmitter.emit(
         `${type}.${historyUpdate.watchStatus.toLowerCase()}`,
         mediaHistory,
