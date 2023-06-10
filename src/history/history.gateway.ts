@@ -27,40 +27,52 @@ export class HistoryGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
-    const type = client.handshake.query.type;
-    const mediaHistory = {
-      episodeId: parseInt(client.handshake.query.mediaId as string),
-      userId: client.handshake.headers['user-id'] as string,
-      stoppedAt: historyUpdate.stoppedAt,
-    };
+    try {
+      const type = client.handshake.query.type;
+      const mediaHistory = {
+        episodeId: parseInt(client.handshake.query.mediaId as string),
+        userId: client.handshake.headers['user-id'] as string,
+        stoppedAt: historyUpdate.stoppedAt,
+      };
 
-    await this.episodeHistoryService.upsertMediaHistory(mediaHistory);
-    this.eventEmitter.emit(
-      `${type}.${historyUpdate.watchStatus.toLowerCase()}`,
-      mediaHistory,
-    );
+      await this.episodeHistoryService.upsertMediaHistory(mediaHistory);
+      this.eventEmitter.emit(
+        `${type}.${historyUpdate.watchStatus.toLowerCase()}`,
+        mediaHistory,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   handleConnection(client: Socket) {
-    const mediaId = parseInt(client.handshake.query.mediaId as string);
-    const type = client.handshake.query.type;
-    if (isNaN(mediaId) && !type) {
-      client.disconnect();
-      return;
+    try {
+      const mediaId = parseInt(client.handshake.query.mediaId as string);
+      const type = client.handshake.query.type;
+      if (isNaN(mediaId) && !type) {
+        client.disconnect();
+        return;
+      }
+      this.eventEmitter.emit(`${type}.started`, {
+        mediaId,
+        userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
+      });
+    } catch (e) {
+      console.log(e);
     }
-    this.eventEmitter.emit(`${type}.started`, {
-      mediaId,
-      userId: client.handshake.headers['user-id'] as string,
-      sessionId: client.id,
-    });
   }
 
   handleDisconnect(client: Socket) {
-    const type = client.handshake.query.type;
-    this.eventEmitter.emit(`${type}.stopped`, {
-      mediaId: parseInt(client.handshake.query.mediaId as string),
-      userId: client.handshake.headers['user-id'] as string,
-      sessionId: client.id,
-    });
+    try {
+      const type = client.handshake.query.type;
+      this.eventEmitter.emit(`${type}.stopped`, {
+        mediaId: parseInt(client.handshake.query.mediaId as string),
+        userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

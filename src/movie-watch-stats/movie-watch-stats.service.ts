@@ -15,6 +15,7 @@ export class MovieWatchStatsService {
     movieId: number;
     userId: string;
   }): Promise<MovieWatchStatsEntity> {
+    console.log(watchStatsEntity);
     return await this.watchStatsRepository.save(watchStatsEntity);
   }
 
