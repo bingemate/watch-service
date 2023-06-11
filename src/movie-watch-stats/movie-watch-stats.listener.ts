@@ -8,7 +8,7 @@ export class MovieWatchStatsListener {
   private readonly sessions = new Map<string, string>();
   constructor(private watchStatsService: MovieWatchStatsService) {}
 
-  @OnEvent('movie.started')
+  @OnEvent('movies.started')
   async handleMediaStartedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
       if (this.sessions.has(payload.sessionId)) {
@@ -25,7 +25,7 @@ export class MovieWatchStatsListener {
     }
   }
 
-  @OnEvent('movie.stopped')
+  @OnEvent('movies.stopped')
   async handleMediaStoppedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
       const mediaHistory = await this.watchStatsService.getStatById(

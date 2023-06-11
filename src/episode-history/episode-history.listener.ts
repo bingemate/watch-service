@@ -7,7 +7,7 @@ import { EpisodeHistoryService } from './episode-history.service';
 export class EpisodeWatchStatsListener {
   constructor(private episodeHistoryService: EpisodeHistoryService) {}
 
-  @OnEvent('episode.playing')
+  @OnEvent('tv-shows.playing')
   async handleMediaPlayingEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
       await this.episodeHistoryService.upsertMediaHistory({

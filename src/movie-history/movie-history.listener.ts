@@ -7,7 +7,7 @@ import { MovieHistoryService } from './movie-history.service';
 export class MovieHistoryListener {
   constructor(private movieHistoryService: MovieHistoryService) {}
 
-  @OnEvent('movie.playing')
+  @OnEvent('movies.playing')
   async handleMediaPlayingEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
       await this.movieHistoryService.upsertMediaHistory({
