@@ -9,6 +9,6 @@ export class MovieWatchListItemEntity {
   @PrimaryColumn({ type: 'uuid' })
   userId: string;
 
-  @Column({ enum: MovieWatchListStatus, nullable: true })
+  @Column({ enum: MovieWatchListStatus, default: MovieWatchListStatus.PLAN_TO_WATCH })
   status: MovieWatchListStatus;
 }
