@@ -9,7 +9,7 @@ export class TvShowWatchListItemEntity {
   @PrimaryColumn({ type: 'uuid' })
   userId: string;
 
-  @Column({ enum: TvShowWatchListStatus })
+  @Column({ enum: TvShowWatchListStatus, nullable: true })
   status: TvShowWatchListStatus;
 
   @Column()
