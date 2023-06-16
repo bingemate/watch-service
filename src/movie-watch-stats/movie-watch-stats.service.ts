@@ -33,7 +33,7 @@ export class MovieWatchStatsService {
     return await this.watchStatsRepository
       .createQueryBuilder()
       .where('MovieWatchStatsEntity.userId=:userId', { userId })
-      .andWhere('MovieWatchStatsEntity.stoppedAt NOT NULL')
+      .andWhere('MovieWatchStatsEntity.stoppedAt!=NULL')
       .getMany();
   }
 }
