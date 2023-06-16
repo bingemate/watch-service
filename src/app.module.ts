@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HistoryModule } from './history/history.module';
-import { WatchListModule } from './watch-list/watch-list.module';
+import { EpisodeHistoryModule } from './episode-history/episode-history.module';
+import { TvShowWatchListModule } from './tv-show-watch-list/tv-show-watch-list.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { PlaylistModule } from './playlist/playlist.module';
+import { EpisodePlaylistModule } from './episode-playlist/episode-playlist.module';
 import { ServiceStatusModule } from './service-status/service-status.module';
-import { WatchStatsModule } from './watch-stats/watch-stats.module';
+import { EpisodeWatchStatsModule } from './episode-watch-stats/episode-watch-stats.module';
+import { MoviePlaylistModule } from './movie-playlist/movie-playlist.module';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { MovieWatchStatsModule } from './movie-watch-stats/movie-watch-stats.module';
+import { MovieHistoryModule } from './movie-history/movie-history.module';
+import { HistoryModule } from './history/history.module';
+import { MovieWatchListModule } from './movie-watch-list/movie-watch-list.module';
 
 @Module({
   imports: [
@@ -22,12 +28,18 @@ import { WatchStatsModule } from './watch-stats/watch-stats.module';
       synchronize: true,
       autoLoadEntities: true,
       logging: false,
+      namingStrategy: new SnakeNamingStrategy(),
     }),
+    EpisodeHistoryModule,
+    MovieHistoryModule,
     HistoryModule,
-    WatchListModule,
-    PlaylistModule,
+    TvShowWatchListModule,
+    MovieWatchListModule,
+    EpisodePlaylistModule,
+    MoviePlaylistModule,
+    EpisodeWatchStatsModule,
+    MovieWatchStatsModule,
     ServiceStatusModule,
-    WatchStatsModule,
   ],
   providers: [],
 })

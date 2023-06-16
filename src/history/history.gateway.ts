@@ -7,55 +7,70 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { UpdateMediaHistoryDto } from './dto/update-media-history.dto';
-import { HistoryService } from './history.service';
+import { UpdateHistoryDto } from './dto/update-history.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { MovieHistoryService } from '../movie-history/movie-history.service';
+import { EpisodeHistoryService } from '../episode-history/episode-history.service';
 
 @WebSocketGateway({ cors: true })
 export class HistoryGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
-    private historyService: HistoryService,
+    private episodeHistoryService: EpisodeHistoryService,
+    private movieHistoryService: MovieHistoryService,
     private eventEmitter: EventEmitter2,
   ) {}
 
   @SubscribeMessage('updateMediaHistory')
   async getMessages(
     @ConnectedSocket() client: Socket,
-    @MessageBody() historyUpdate: UpdateMediaHistoryDto,
+    @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
-    const mediaHistory = {
-      mediaId: parseInt(client.handshake.query.mediaId as string),
-      userId: client.handshake.headers['user-id'] as string,
-      stoppedAt: historyUpdate.stoppedAt,
-    };
-
-    await this.historyService.upsertMediaHistory(mediaHistory);
-    this.eventEmitter.emit(
-      `media.${historyUpdate.watchStatus.toLowerCase()}`,
-      mediaHistory,
-    );
+    try {
+      const type = client.handshake.query.type;
+      const mediaHistory = {
+        mediaId: parseInt(client.handshake.query.mediaId as string),
+        userId: client.handshake.headers['user-id'] as string,
+        stoppedAt: historyUpdate.stoppedAt,
+      };
+      this.eventEmitter.emit(
+        `${type}.${historyUpdate.watchStatus.toLowerCase()}`,
+        mediaHistory,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   handleConnection(client: Socket) {
-    const mediaId = parseInt(client.handshake.query.mediaId as string);
-    if (isNaN(mediaId)) {
-      client.disconnect();
-      return;
+    try {
+      const mediaId = parseInt(client.handshake.query.mediaId as string);
+      const type = client.handshake.query.type;
+      if (isNaN(mediaId) && !type) {
+        client.disconnect();
+        return;
+      }
+      this.eventEmitter.emit(`${type}.started`, {
+        mediaId,
+        userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
+      });
+    } catch (e) {
+      console.log(e);
     }
-    this.eventEmitter.emit(`media.started`, {
-      mediaId,
-      userId: client.handshake.headers['user-id'] as string,
-      sessionId: client.id,
-    });
   }
 
   handleDisconnect(client: Socket) {
-    this.eventEmitter.emit(`media.stopped`, {
-      mediaId: parseInt(client.handshake.query.mediaId as string),
-      userId: client.handshake.headers['user-id'] as string,
-      sessionId: client.id,
-    });
+    try {
+      const type = client.handshake.query.type;
+      this.eventEmitter.emit(`${type}.stopped`, {
+        mediaId: parseInt(client.handshake.query.mediaId as string),
+        userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
