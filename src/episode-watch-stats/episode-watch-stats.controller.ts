@@ -22,6 +22,6 @@ export class EpisodeWatchStatsController {
   async getUserStats(
     @Param('userId') userId: string,
   ): Promise<EpisodeWatchStatsEntity[]> {
-    return await this.watchStatsService.getStatsByuserId(userId);
+    return await this.watchStatsService.getStatsByUserId(userId);
   }
 }

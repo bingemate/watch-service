@@ -29,10 +29,11 @@ export class EpisodeWatchStatsService {
     await this.watchStatsRepository.save(watchStatsEntity);
   }
 
-  async getStatsByuserId(userId: string) {
+  async getStatsByUserId(userId: string) {
     return await this.watchStatsRepository
       .createQueryBuilder()
       .where('EpisodeWatchStatsEntity.userId=:userId', { userId })
+      .andWhere('EpisodeWatchStatsEntity.stoppedAt NOT NULL')
       .getMany();
   }
 }

@@ -22,6 +22,6 @@ export class MovieWatchStatsController {
   async getUserStats(
     @Param('userId') userId: string,
   ): Promise<MovieWatchStatsEntity[]> {
-    return await this.watchStatsService.getStatsByuserId(userId);
+    return await this.watchStatsService.getStatsByUserId(userId);
   }
 }
