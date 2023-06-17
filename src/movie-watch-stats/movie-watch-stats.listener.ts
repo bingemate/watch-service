@@ -28,6 +28,9 @@ export class MovieWatchStatsListener {
   @OnEvent('movies.stopped')
   async handleMediaStoppedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
+      if (!this.sessions.has(payload.sessionId)) {
+        return;
+      }
       const mediaHistory = await this.watchStatsService.getStatById(
         this.sessions.get(payload.sessionId),
       );

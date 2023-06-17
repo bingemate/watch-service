@@ -33,7 +33,7 @@ export class EpisodeWatchStatsService {
     return await this.watchStatsRepository
       .createQueryBuilder()
       .where('EpisodeWatchStatsEntity.userId=:userId', { userId })
-      .andWhere('EpisodeWatchStatsEntity.stoppedAt NOT NULL')
+      .andWhere('EpisodeWatchStatsEntity.stoppedAt IS NOT NULL')
       .getMany();
   }
 }
