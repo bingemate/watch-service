@@ -287,13 +287,21 @@ export class WatchTogetherGateway
   }
 
   private async emitRoomsToUser(userId: string) {
-    this.emitToUser(
+    const invitations = await this.watchTogetherService.getInvitationsByUserId(
       userId,
-      'rooms',
-      (await this.watchTogetherService.getInvitationsByUserId(userId))
-        .map((invitation) => this.rooms.get(invitation.roomId))
-        .filter((room) => room !== null && room !== undefined),
     );
+    const rooms = [];
+    for (const invitation of invitations) {
+      const room = this.rooms.get(invitation.roomId);
+      if (room) {
+        rooms.push(room);
+      } else {
+        this.watchTogetherService
+          .deleteInvitationsByRoomId(invitation.roomId)
+          .then();
+      }
+    }
+    this.emitToUser(userId, 'rooms', rooms);
   }
 
   private emitToUser(userId: string, message: string, data?: unknown) {
