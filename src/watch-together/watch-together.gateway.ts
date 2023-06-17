@@ -99,7 +99,7 @@ export class WatchTogetherGateway
         room.invitedUsers.map((userId) => ({ userId, roomId })),
       );
       room.invitedUsers.forEach((user) => {
-        this.emitToUser(user, 'invitedToRoom', roomId);
+        this.emitToUser(user, 'invitedToRoom', room);
       });
       client.emit('roomStatus', room);
     } catch (e) {
