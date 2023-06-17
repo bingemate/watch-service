@@ -8,6 +8,7 @@ export interface WatchTogetherRoom {
   playlistPosition: number;
   position: number;
   status: WatchTogetherStatus;
+  autoplay: boolean;
 }
 
 export enum WatchTogetherStatus {
