@@ -2,6 +2,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -16,7 +17,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { WatchTogetherService } from './watch-together.service';
 
 @WebSocketGateway({ namespace: 'watch-together', cors: true })
-export class WatchTogetherGateway implements OnGatewayConnection {
+export class WatchTogetherGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   connectedUsers = new Map<string, string[]>();
@@ -29,6 +32,26 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     this.connectedUsers.set(client.handshake.headers['user-id'] as string, [
       client.id,
     ]);
+  }
+
+  handleDisconnect(client: Socket) {
+    const userId = client.handshake.headers['user-id'] as string;
+    const userSessions = this.connectedUsers.get(userId);
+    if (userSessions.length === 1) {
+      this.connectedUsers.delete(userId);
+    } else {
+      this.connectedUsers.set(
+        userId,
+        userSessions.filter((user) => user !== userId),
+      );
+    }
+    const roomId = this.joinedRoom.get(userId);
+    const room = this.rooms.get(roomId);
+    room.joinedSessions = room.joinedSessions.filter(
+      (user) => client.id !== user,
+    );
+    this.joinedRoom.delete(userId);
+    this.deleteRoom(room);
   }
 
   @SubscribeMessage('createRoom')
