@@ -22,11 +22,8 @@ export class WatchTogetherService {
   async createInvitations(invitations: { roomId: string; userId: string }[]) {
     await this.invitationsEntityRepository.save(invitations);
   }
-  async deleteInvitationByRoomId(roomId: string) {
-    await this.invitationsEntityRepository
-      .createQueryBuilder()
-      .where({ roomId })
-      .delete()
-      .execute();
+
+  async deleteInvitationsByRoomId(roomId: string) {
+    await this.invitationsEntityRepository.delete({ roomId });
   }
 }

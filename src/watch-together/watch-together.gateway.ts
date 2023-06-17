@@ -184,7 +184,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   private async deleteRoom(room: WatchTogetherRoom) {
     if (room.joinedSessions.length === 0) {
       this.rooms.delete(room.id);
-      await this.watchTogetherService.deleteInvitationByRoomId(room.id);
+      await this.watchTogetherService.deleteInvitationsByRoomId(room.id);
       for (const user of room.invitedUsers) {
         this.emitToUser(
           user,
