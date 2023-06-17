@@ -13,6 +13,7 @@ import { MovieWatchStatsModule } from './movie-watch-stats/movie-watch-stats.mod
 import { MovieHistoryModule } from './movie-history/movie-history.module';
 import { HistoryModule } from './history/history.module';
 import { MovieWatchListModule } from './movie-watch-list/movie-watch-list.module';
+import { WatchTogetherModule } from './watch-together/watch-together.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MovieWatchListModule } from './movie-watch-list/movie-watch-list.module
     EpisodeHistoryModule,
     MovieHistoryModule,
     HistoryModule,
+    WatchTogetherModule,
     TvShowWatchListModule,
     MovieWatchListModule,
     EpisodePlaylistModule,
