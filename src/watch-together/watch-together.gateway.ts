@@ -86,7 +86,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       room.joinedSessions = room.joinedSessions.filter(
         (user) => user !== client.id,
       );
-      this.deleteRoom(room);
+      await this.deleteRoom(room);
     }
   }
 
@@ -102,15 +102,20 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   @SubscribeMessage('addMedia')
   async addMedia(@ConnectedSocket() client: Socket, mediaId: number) {
     const roomId = this.joinedRoom.get(client.id);
-    this.rooms.get(roomId).mediaIds.push(mediaId);
-    client.emit('mediaAdded', mediaId);
+    const room = this.rooms.get(roomId);
+    if (room && room.joinedSessions.includes(client.id)) {
+      room.mediaIds.push(mediaId);
+      room.joinedSessions.forEach((user) =>
+        this.emitToUser(user, 'roomStatus', room),
+      );
+    }
   }
 
   @SubscribeMessage('pause')
   async paused(@ConnectedSocket() client: Socket) {
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
-    if (room.joinedSessions.includes(client.id)) {
+    if (room && room.joinedSessions.includes(client.id)) {
       room.status = WatchTogetherStatus.PAUSED;
       room.joinedSessions.forEach((user) =>
         this.emitToUser(user, 'roomStatus', room),
