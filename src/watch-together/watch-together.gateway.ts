@@ -15,7 +15,7 @@ import { CreateWatchTogetherRoomDto } from './dto/create-watch-together-room.dto
 import { v4 as uuidv4 } from 'uuid';
 import { WatchTogetherService } from './watch-together.service';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ namespace: 'watch-together', cors: true })
 export class WatchTogetherGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -71,6 +71,9 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     ) {
       room.joinedSessions.push(client.id);
       this.joinedRoom.set(client.id, roomId);
+      room.joinedSessions.forEach((user) =>
+        this.server.to(user).emit('roomStatus', room),
+      );
     }
   }
 
@@ -83,10 +86,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       room.joinedSessions = room.joinedSessions.filter(
         (user) => user !== client.id,
       );
-      if (room.joinedSessions.length === 0) {
-        this.rooms.delete(roomId);
-        await this.watchTogetherService.deleteInvitationByRoomId(roomId);
-      }
+      this.deleteRoom(room);
     }
   }
 
@@ -113,7 +113,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     if (room.joinedSessions.includes(client.id)) {
       room.status = WatchTogetherStatus.PAUSED;
       room.joinedSessions.forEach((user) =>
-        this.emitToUser(user, 'roomStatus.pause', room),
+        this.emitToUser(user, 'roomStatus', room),
       );
     }
   }
@@ -125,7 +125,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     if (room.joinedSessions.includes(client.id)) {
       room.status = WatchTogetherStatus.PLAYING;
       room.joinedSessions.forEach((user) =>
-        this.emitToUser(user, 'roomStatus.play', room),
+        this.emitToUser(user, 'roomStatus', room),
       );
     }
   }
@@ -139,7 +139,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       if (room.ownerId === userId) {
         room.position = position;
         room.joinedSessions.forEach((user) =>
-          this.emitToUser(user, 'roomStatus.playing', room),
+          this.emitToUser(user, 'roomStatus', room),
         );
       }
     }
@@ -152,8 +152,37 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     if (room.joinedSessions.includes(client.id)) {
       room.position = position;
       room.joinedSessions.forEach((user) =>
-        this.emitToUser(user, 'roomStatus.seek', room),
+        this.emitToUser(user, 'roomStatus', room),
       );
+    }
+  }
+
+  @SubscribeMessage('changeMedia')
+  async changeMedia(
+    @ConnectedSocket() client: Socket,
+    playlistPosition: number,
+  ) {
+    const roomId = this.joinedRoom.get(client.id);
+    const room = this.rooms.get(roomId);
+    if (room.joinedSessions.includes(client.id)) {
+      room.playlistPosition = playlistPosition;
+      room.joinedSessions.forEach((user) =>
+        this.emitToUser(user, 'roomStatus', room),
+      );
+    }
+  }
+
+  private async deleteRoom(room: WatchTogetherRoom) {
+    if (room.joinedSessions.length === 0) {
+      this.rooms.delete(room.id);
+      await this.watchTogetherService.deleteInvitationByRoomId(room.id);
+      for (const user of room.invitedUsers) {
+        this.emitToUser(
+          user,
+          'rooms',
+          await this.watchTogetherService.getInvitationsByUserId(user),
+        );
+      }
     }
   }
 
