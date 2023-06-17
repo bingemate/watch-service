@@ -38,6 +38,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   ): Promise<void> {
     const roomId = uuidv4();
     const userId = client.handshake.headers['user-id'] as string;
+    createRoom.invitedUsers.push(userId);
     this.rooms.set(roomId, {
       id: roomId,
       ownerId: userId,
