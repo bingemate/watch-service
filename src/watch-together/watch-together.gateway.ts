@@ -182,7 +182,10 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   ) {
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
-    if (room.joinedSessions.includes(client.id)) {
+    if (
+      room.joinedSessions.includes(client.id) &&
+      playlistPosition < room.mediaIds.length
+    ) {
       room.playlistPosition = playlistPosition;
       room.joinedSessions.forEach((user) =>
         this.server.to(user).emit('roomStatus', room),
