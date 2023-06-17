@@ -147,6 +147,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     if (room.joinedSessions.includes(client.id)) {
       if (room.ownerId === userId) {
         room.position = position;
+        console.log(room, position);
         room.joinedSessions.forEach((user) =>
           this.server.to(user).emit('roomStatus', room),
         );
