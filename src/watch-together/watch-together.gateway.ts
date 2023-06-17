@@ -104,7 +104,10 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('addMedia')
-  async addMedia(@ConnectedSocket() client: Socket, mediaId: number) {
+  async addMedia(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() mediaId: number,
+  ) {
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
     if (room && room.joinedSessions.includes(client.id)) {
@@ -140,14 +143,16 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('playing')
-  async playing(@ConnectedSocket() client: Socket, position: number) {
+  async playing(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() position: number,
+  ) {
     const userId = client.handshake.headers['user-id'] as string;
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
     if (room.joinedSessions.includes(client.id)) {
       if (room.ownerId === userId) {
         room.position = position;
-        console.log(room, position);
         room.joinedSessions.forEach((user) =>
           this.server.to(user).emit('roomStatus', room),
         );
@@ -156,7 +161,10 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('seek')
-  async seek(@ConnectedSocket() client: Socket, position: number) {
+  async seek(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() position: number,
+  ) {
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
     if (room.joinedSessions.includes(client.id)) {
@@ -170,7 +178,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   @SubscribeMessage('changeMedia')
   async changeMedia(
     @ConnectedSocket() client: Socket,
-    playlistPosition: number,
+    @MessageBody() playlistPosition: number,
   ) {
     const roomId = this.joinedRoom.get(client.id);
     const room = this.rooms.get(roomId);
