@@ -49,12 +49,12 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       position: 0,
       status: WatchTogetherStatus.PAUSED,
     };
-    createRoom.invitedUsers.push(userId);
+    room.invitedUsers.push(userId);
     this.rooms.set(roomId, room);
     await this.watchTogetherService.createInvitations(
-      createRoom.invitedUsers.map((userId) => ({ userId, roomId })),
+      room.invitedUsers.map((userId) => ({ userId, roomId })),
     );
-    createRoom.invitedUsers.forEach((user) => {
+    room.invitedUsers.forEach((user) => {
       this.emitToUser(user, 'invitedToRoom', roomId);
     });
     client.emit('roomStatus', room);
