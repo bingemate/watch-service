@@ -46,12 +46,14 @@ export class WatchTogetherGateway
       );
     }
     const roomId = this.joinedRoom.get(userId);
-    const room = this.rooms.get(roomId);
-    room.joinedSessions = room.joinedSessions.filter(
-      (user) => client.id !== user,
-    );
-    this.joinedRoom.delete(userId);
-    this.deleteRoom(room);
+    if (roomId) {
+      const room = this.rooms.get(roomId);
+      room.joinedSessions = room.joinedSessions.filter(
+        (user) => client.id !== user,
+      );
+      this.joinedRoom.delete(userId);
+      this.deleteRoom(room);
+    }
   }
 
   @SubscribeMessage('createRoom')
