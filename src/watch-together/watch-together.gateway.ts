@@ -38,8 +38,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   ): Promise<void> {
     const roomId = uuidv4();
     const userId = client.handshake.headers['user-id'] as string;
-    createRoom.invitedUsers.push(userId);
-    this.rooms.set(roomId, {
+    const room = {
       id: roomId,
       ownerId: userId,
       joinedSessions: [client.id],
@@ -49,13 +48,16 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       mediaType: createRoom.mediaType,
       position: 0,
       status: WatchTogetherStatus.PAUSED,
-    });
+    };
+    createRoom.invitedUsers.push(userId);
+    this.rooms.set(roomId, room);
     await this.watchTogetherService.createInvitations(
       createRoom.invitedUsers.map((userId) => ({ userId, roomId })),
     );
     createRoom.invitedUsers.forEach((user) => {
       this.emitToUser(user, 'invitedToRoom', roomId);
     });
+    client.emit('roomStatus', room);
   }
 
   @SubscribeMessage('joinRoom')
