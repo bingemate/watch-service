@@ -152,10 +152,7 @@ export class WatchTogetherGateway
   async getRooms(@ConnectedSocket() client: Socket) {
     try {
       const userId = client.handshake.headers['user-id'] as string;
-      const rooms = (
-        await this.watchTogetherService.getInvitationsByUserId(userId)
-      ).map((invitation) => this.rooms.get(invitation.roomId));
-      client.emit('rooms', rooms);
+      await this.emitRoomsToUser(userId);
     } catch (e) {
       Logger.error('Error on get rooms', e);
     }
@@ -281,16 +278,22 @@ export class WatchTogetherGateway
         this.rooms.delete(room.id);
         await this.watchTogetherService.deleteInvitationsByRoomId(room.id);
         for (const user of room.invitedUsers) {
-          this.emitToUser(
-            user,
-            'rooms',
-            await this.watchTogetherService.getInvitationsByUserId(user),
-          );
+          await this.emitRoomsToUser(user);
         }
       }
     } catch (e) {
       Logger.error('Error while deleting room', e);
     }
+  }
+
+  private async emitRoomsToUser(userId: string) {
+    this.emitToUser(
+      userId,
+      'rooms',
+      (await this.watchTogetherService.getInvitationsByUserId(userId))
+        .map((invitation) => this.rooms.get(invitation.roomId))
+        .filter((room) => room !== null && room !== undefined),
+    );
   }
 
   private emitToUser(userId: string, message: string, data?: unknown) {
