@@ -37,6 +37,9 @@ export class WatchTogetherGateway
   handleDisconnect(client: Socket) {
     const userId = client.handshake.headers['user-id'] as string;
     const userSessions = this.connectedUsers.get(userId);
+    if (!userSessions) {
+      return;
+    }
     if (userSessions.length === 1) {
       this.connectedUsers.delete(userId);
     } else {
