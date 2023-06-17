@@ -84,7 +84,7 @@ export class WatchTogetherGateway
       const room = {
         id: roomId,
         ownerId: userId,
-        joinedSessions: [client.id],
+        joinedSessions: [],
         invitedUsers: createRoom.invitedUsers,
         playlistPosition: createRoom.playlistPosition,
         mediaIds: createRoom.mediaIds,
@@ -221,8 +221,6 @@ export class WatchTogetherGateway
       const userId = client.handshake.headers['user-id'] as string;
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
-      Logger.debug(userId, roomId, room);
-      Logger.debug(this.joinedRoom, this.rooms);
       if (room.joinedSessions.includes(client.id)) {
         if (room.ownerId === userId) {
           room.position = position;
