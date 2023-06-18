@@ -1,5 +1,5 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MovieWatchStatsService } from './movie-watch-stats.service';
 import { HistoryUpdatedEvent } from '../history/events/history-updated.event';
 
@@ -21,19 +21,18 @@ export class MovieWatchStatsListener {
       });
       this.sessions.set(payload.sessionId, statPeriod.id);
     } catch (e) {
-      console.log(e);
+      Logger.error('Error on movie start event', e);
     }
   }
 
   @OnEvent('movies.stopped')
   async handleMediaStoppedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
-      if (!this.sessions.has(payload.sessionId)) {
+      const movieId = this.sessions.get(payload.sessionId);
+      if (!movieId) {
         return;
       }
-      const mediaHistory = await this.watchStatsService.getStatById(
-        this.sessions.get(payload.sessionId),
-      );
+      const mediaHistory = await this.watchStatsService.getStatById(movieId);
       this.sessions.delete(payload.sessionId);
       mediaHistory.stoppedAt = new Date();
       if (
@@ -48,7 +47,7 @@ export class MovieWatchStatsListener {
       }
       await this.watchStatsService.updateStatPeriod(mediaHistory);
     } catch (e) {
-      console.log(e);
+      Logger.error('Error on movie stop event', e);
     }
   }
 }
