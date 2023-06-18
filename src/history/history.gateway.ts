@@ -2,7 +2,6 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
@@ -13,9 +12,7 @@ import { MovieHistoryService } from '../movie-history/movie-history.service';
 import { EpisodeHistoryService } from '../episode-history/episode-history.service';
 
 @WebSocketGateway({ cors: true })
-export class HistoryGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class HistoryGateway implements OnGatewayConnection {
   constructor(
     private episodeHistoryService: EpisodeHistoryService,
     private movieHistoryService: MovieHistoryService,
@@ -51,17 +48,15 @@ export class HistoryGateway
         client.disconnect();
         return;
       }
-      this.eventEmitter.emit(`${type}.started`, {
-        mediaId,
-        userId: client.handshake.headers['user-id'] as string,
-        sessionId: client.id,
+      client.on('disconnecting', () => {
+        this.onDisconnect(client);
       });
     } catch (e) {
       console.log(e);
     }
   }
 
-  handleDisconnect(client: Socket) {
+  onDisconnect(client: Socket) {
     try {
       const type = client.handshake.query.type;
       this.eventEmitter.emit(`${type}.stopped`, {

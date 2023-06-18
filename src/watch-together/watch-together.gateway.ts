@@ -2,7 +2,6 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -18,9 +17,7 @@ import { WatchTogetherService } from './watch-together.service';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: 'watch-together', cors: true })
-export class WatchTogetherGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class WatchTogetherGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
   connectedUsers = new Map<string, string[]>();
@@ -33,6 +30,9 @@ export class WatchTogetherGateway
     try {
       const userId = client.handshake.headers['user-id'] as string;
       let sessions = this.connectedUsers.get(userId);
+      client.on('disconnecting', () => {
+        this.onDisconnect(client);
+      });
       if (sessions) {
         sessions.push(client.id);
       } else {
@@ -44,7 +44,7 @@ export class WatchTogetherGateway
     }
   }
 
-  handleDisconnect(client: Socket) {
+  onDisconnect(client: Socket) {
     try {
       const userId = client.handshake.headers['user-id'] as string;
       const userSessions = this.connectedUsers.get(userId);
