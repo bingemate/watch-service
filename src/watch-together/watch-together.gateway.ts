@@ -169,7 +169,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       if (room && room.joinedSessions.includes(client.id)) {
         room.mediaIds.push(mediaId);
         room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
+          this.server.to(user).emit('addedMedia', mediaId),
         );
       }
     } catch (e) {
