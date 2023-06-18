@@ -18,12 +18,27 @@ export class EpisodeHistoryService {
       .getMany();
   }
 
-  async upsertMediaHistory(mediaHistory: {
+  async getHistory(userId: string, episodeId: number) {
+    return this.mediaHistoryRepository.findBy({ userId, episodeId });
+  }
+
+  async createMediaHistory(mediaHistory: {
     stoppedAt: number;
     episodeId: number;
     userId: string;
   }): Promise<void> {
     await this.mediaHistoryRepository.save(mediaHistory);
+  }
+
+  async updateEpisodeHistory(
+    userId: string,
+    episodeId: number,
+    stoppedAt: number,
+  ): Promise<void> {
+    await this.mediaHistoryRepository.update(
+      { episodeId, userId },
+      { stoppedAt },
+    );
   }
 
   async deleteMediaHistory(episodeId: number, userId: string): Promise<void> {
