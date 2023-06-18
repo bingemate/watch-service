@@ -99,9 +99,11 @@ export class WatchTogetherGateway implements OnGatewayConnection {
         room.invitedUsers.map((userId) => ({ userId, roomId })),
       );
       room.invitedUsers.forEach((user) => {
-        this.emitToUser(user, 'invitedToRoom', room);
+        if (user !== userId) {
+          this.emitToUser(user, 'invitedToRoom', room);
+        }
       });
-      client.emit('roomStatus', room);
+      client.emit('roomCreated', roomId);
     } catch (e) {
       Logger.error('Error on room creation', e);
     }
@@ -122,9 +124,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       ) {
         room.joinedSessions.push(client.id);
         this.joinedRoom.set(client.id, roomId);
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
+        client.emit('roomJoined', room);
       }
     } catch (e) {
       Logger.error('Error while joining room', e);
