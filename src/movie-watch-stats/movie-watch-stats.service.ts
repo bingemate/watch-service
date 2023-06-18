@@ -36,4 +36,11 @@ export class MovieWatchStatsService {
       .andWhere('MovieWatchStatsEntity.stoppedAt IS NOT NULL')
       .getMany();
   }
+
+  async getStats() {
+    return await this.watchStatsRepository
+      .createQueryBuilder()
+      .where('MovieWatchStatsEntity.stoppedAt IS NOT NULL')
+      .getMany();
+  }
 }
