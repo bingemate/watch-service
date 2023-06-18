@@ -184,9 +184,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.rooms.get(roomId);
       if (room && room.joinedSessions.includes(client.id)) {
         room.status = WatchTogetherStatus.PAUSED;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error while pausing', e);
@@ -200,9 +197,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.rooms.get(roomId);
       if (room.joinedSessions.includes(client.id)) {
         room.status = WatchTogetherStatus.PLAYING;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error on play', e);
@@ -221,9 +215,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       if (room.joinedSessions.includes(client.id)) {
         if (room.ownerId === userId) {
           room.position = position;
-          room.joinedSessions.forEach((user) =>
-            this.server.to(user).emit('roomStatus', room),
-          );
         }
       }
     } catch (e) {
@@ -241,9 +232,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.rooms.get(roomId);
       if (room.joinedSessions.includes(client.id)) {
         room.position = position;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error on seek', e);
@@ -263,9 +251,19 @@ export class WatchTogetherGateway implements OnGatewayConnection {
         playlistPosition < room.mediaIds.length
       ) {
         room.playlistPosition = playlistPosition;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
+      }
+    } catch (e) {
+      Logger.error('Error while changing media', e);
+    }
+  }
+
+  @SubscribeMessage('getRoomStatus')
+  async getRoomStatus(@ConnectedSocket() client: Socket) {
+    try {
+      const roomId = this.joinedRoom.get(client.id);
+      if (roomId) {
+        const room = this.rooms.get(roomId);
+        client.emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while changing media', e);
