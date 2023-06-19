@@ -10,11 +10,23 @@ export class MovieHistoryListener {
   @OnEvent('movies.playing')
   async handleMediaPlayingEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
-      await this.movieHistoryService.upsertMediaHistory({
-        movieId: payload.mediaId,
-        userId: payload.userId,
-        stoppedAt: payload.stoppedAt,
-      });
+      const history = await this.movieHistoryService.getHistory(
+        payload.userId,
+        payload.mediaId,
+      );
+      if (history) {
+        await this.movieHistoryService.updateMovieHistory(
+          payload.userId,
+          payload.mediaId,
+          payload.stoppedAt,
+        );
+      } else {
+        await this.movieHistoryService.createMovieHistory({
+          userId: payload.userId,
+          movieId: payload.mediaId,
+          stoppedAt: payload.stoppedAt,
+        });
+      }
     } catch (e) {
       console.log(e);
     }

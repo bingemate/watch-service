@@ -10,11 +10,23 @@ export class EpisodeWatchStatsListener {
   @OnEvent('tv-shows.playing')
   async handleMediaPlayingEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
-      await this.episodeHistoryService.upsertMediaHistory({
-        episodeId: payload.mediaId,
-        userId: payload.userId,
-        stoppedAt: payload.stoppedAt,
-      });
+      const history = await this.episodeHistoryService.getHistory(
+        payload.userId,
+        payload.mediaId,
+      );
+      if (history) {
+        await this.episodeHistoryService.updateEpisodeHistory(
+          payload.userId,
+          payload.mediaId,
+          payload.stoppedAt,
+        );
+      } else {
+        await this.episodeHistoryService.createMediaHistory({
+          userId: payload.userId,
+          episodeId: payload.mediaId,
+          stoppedAt: payload.stoppedAt,
+        });
+      }
     } catch (e) {
       console.log(e);
     }

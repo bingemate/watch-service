@@ -2,7 +2,6 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
-  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -18,9 +17,7 @@ import { WatchTogetherService } from './watch-together.service';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: 'watch-together', cors: true })
-export class WatchTogetherGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class WatchTogetherGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
   connectedUsers = new Map<string, string[]>();
@@ -33,6 +30,9 @@ export class WatchTogetherGateway
     try {
       const userId = client.handshake.headers['user-id'] as string;
       let sessions = this.connectedUsers.get(userId);
+      client.on('disconnecting', () => {
+        this.onDisconnect(client);
+      });
       if (sessions) {
         sessions.push(client.id);
       } else {
@@ -44,7 +44,7 @@ export class WatchTogetherGateway
     }
   }
 
-  handleDisconnect(client: Socket) {
+  onDisconnect(client: Socket) {
     try {
       const userId = client.handshake.headers['user-id'] as string;
       const userSessions = this.connectedUsers.get(userId);
@@ -99,9 +99,11 @@ export class WatchTogetherGateway
         room.invitedUsers.map((userId) => ({ userId, roomId })),
       );
       room.invitedUsers.forEach((user) => {
-        this.emitToUser(user, 'invitedToRoom', room);
+        if (user !== userId) {
+          this.emitToUser(user, 'invitedToRoom', room);
+        }
       });
-      client.emit('roomStatus', room);
+      client.emit('roomCreated', roomId);
     } catch (e) {
       Logger.error('Error on room creation', e);
     }
@@ -122,9 +124,7 @@ export class WatchTogetherGateway
       ) {
         room.joinedSessions.push(client.id);
         this.joinedRoom.set(client.id, roomId);
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
+        client.emit('roomJoined', room);
       }
     } catch (e) {
       Logger.error('Error while joining room', e);
@@ -169,7 +169,7 @@ export class WatchTogetherGateway
       if (room && room.joinedSessions.includes(client.id)) {
         room.mediaIds.push(mediaId);
         room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
+          this.server.to(user).emit('addedMedia', mediaId),
         );
       }
     } catch (e) {
@@ -184,9 +184,6 @@ export class WatchTogetherGateway
       const room = this.rooms.get(roomId);
       if (room && room.joinedSessions.includes(client.id)) {
         room.status = WatchTogetherStatus.PAUSED;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error while pausing', e);
@@ -200,9 +197,6 @@ export class WatchTogetherGateway
       const room = this.rooms.get(roomId);
       if (room.joinedSessions.includes(client.id)) {
         room.status = WatchTogetherStatus.PLAYING;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error on play', e);
@@ -221,9 +215,6 @@ export class WatchTogetherGateway
       if (room.joinedSessions.includes(client.id)) {
         if (room.ownerId === userId) {
           room.position = position;
-          room.joinedSessions.forEach((user) =>
-            this.server.to(user).emit('roomStatus', room),
-          );
         }
       }
     } catch (e) {
@@ -241,9 +232,6 @@ export class WatchTogetherGateway
       const room = this.rooms.get(roomId);
       if (room.joinedSessions.includes(client.id)) {
         room.position = position;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
       }
     } catch (e) {
       Logger.error('Error on seek', e);
@@ -263,9 +251,19 @@ export class WatchTogetherGateway
         playlistPosition < room.mediaIds.length
       ) {
         room.playlistPosition = playlistPosition;
-        room.joinedSessions.forEach((user) =>
-          this.server.to(user).emit('roomStatus', room),
-        );
+      }
+    } catch (e) {
+      Logger.error('Error while changing media', e);
+    }
+  }
+
+  @SubscribeMessage('getRoomStatus')
+  async getRoomStatus(@ConnectedSocket() client: Socket) {
+    try {
+      const roomId = this.joinedRoom.get(client.id);
+      if (roomId) {
+        const room = this.rooms.get(roomId);
+        client.emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while changing media', e);

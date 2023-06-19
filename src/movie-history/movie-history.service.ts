@@ -18,12 +18,27 @@ export class MovieHistoryService {
       .getMany();
   }
 
-  async upsertMediaHistory(mediaHistory: {
+  async getHistory(userId: string, movieId: number) {
+    return this.mediaHistoryRepository.findBy({ userId, movieId });
+  }
+
+  async createMovieHistory(mediaHistory: {
     stoppedAt: number;
     movieId: number;
     userId: string;
   }): Promise<void> {
     await this.mediaHistoryRepository.save(mediaHistory);
+  }
+
+  async updateMovieHistory(
+    userId: string,
+    movieId: number,
+    stoppedAt: number,
+  ): Promise<void> {
+    await this.mediaHistoryRepository.update(
+      { movieId, userId },
+      { stoppedAt },
+    );
   }
 
   async deleteMediaHistory(mediaId: number, userId: string): Promise<void> {

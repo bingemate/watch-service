@@ -24,4 +24,13 @@ export class MovieWatchStatsController {
   ): Promise<MovieWatchStatsEntity[]> {
     return await this.watchStatsService.getStatsByUserId(userId);
   }
+
+  @ApiOperation({
+    description: 'Get all stats',
+  })
+  @ApiOkResponse({ type: [MovieWatchStatsEntity] })
+  @Get('/')
+  async getStats(): Promise<MovieWatchStatsEntity[]> {
+    return await this.watchStatsService.getStats();
+  }
 }

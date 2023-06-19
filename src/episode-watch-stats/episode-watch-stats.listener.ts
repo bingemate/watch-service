@@ -1,5 +1,5 @@
 import { OnEvent } from '@nestjs/event-emitter';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EpisodeWatchStatsService } from './episode-watch-stats.service';
 import { HistoryUpdatedEvent } from '../history/events/history-updated.event';
 
@@ -21,16 +21,18 @@ export class EpisodeWatchStatsListener {
       });
       this.sessions.set(payload.sessionId, statPeriod.id);
     } catch (e) {
-      console.log(e);
+      Logger.error('Error on episode start event', e);
     }
   }
 
   @OnEvent('tv-shows.stopped')
   async handleMediaStoppedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
-      const mediaHistory = await this.watchStatsService.getStatById(
-        this.sessions.get(payload.sessionId),
-      );
+      const episodeId = this.sessions.get(payload.sessionId);
+      if (!episodeId) {
+        return;
+      }
+      const mediaHistory = await this.watchStatsService.getStatById(episodeId);
       this.sessions.delete(payload.sessionId);
       mediaHistory.stoppedAt = new Date();
       if (
@@ -45,7 +47,7 @@ export class EpisodeWatchStatsListener {
       }
       await this.watchStatsService.updateStatPeriod(mediaHistory);
     } catch (e) {
-      console.log(e);
+      Logger.error('Error on episode stop event', e);
     }
   }
 }
