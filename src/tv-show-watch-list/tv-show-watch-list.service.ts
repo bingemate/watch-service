@@ -3,48 +3,69 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TvShowWatchListItemEntity } from './tv-show-watch-list-item.entity';
 import { TvShowWatchListStatus } from './tv-show-watch-list-status.enum';
+import { EpisodeWatchListItemEntity } from './episode-watch-list-item.entity';
 
 @Injectable()
 export class TvShowWatchListService {
   constructor(
     @InjectRepository(TvShowWatchListItemEntity)
-    private readonly watchListRepository: Repository<TvShowWatchListItemEntity>,
+    private readonly tvShowWatchListRepository: Repository<TvShowWatchListItemEntity>,
+    @InjectRepository(EpisodeWatchListItemEntity)
+    private readonly episodeWatchListRepository: Repository<EpisodeWatchListItemEntity>,
   ) {}
 
   async getWatchListByUserId(
     userId: string,
   ): Promise<TvShowWatchListItemEntity[]> {
-    return await this.watchListRepository
-      .createQueryBuilder()
-      .where({ userId })
-      .getMany();
+    return await this.tvShowWatchListRepository.findBy({ userId });
   }
 
   async getWatchListItemById(
     userId: string,
     tvShowId: number,
   ): Promise<TvShowWatchListItemEntity> {
-    return await this.watchListRepository
+    return await this.tvShowWatchListRepository
       .createQueryBuilder()
       .where({ userId, tvShowId })
       .getOne();
   }
 
-  async createWatchListItem(watchListItemEntity: TvShowWatchListItemEntity) {
-    await this.watchListRepository.save(watchListItemEntity);
+  async createEpisodeWatchListItem(item: {
+    tvShow: { tvShowId: number; userId: string };
+    episodeId: number;
+    userId: string;
+    status: TvShowWatchListStatus;
+  }) {
+    await this.episodeWatchListRepository.save(item);
   }
 
-  async deleteWatchListItem(userId: string, tvShowId: number) {
-    await this.watchListRepository.delete({ userId, tvShowId: tvShowId });
+  async createTvShowWatchListItem(
+    watchListItemEntity: TvShowWatchListItemEntity,
+  ) {
+    await this.tvShowWatchListRepository.save(watchListItemEntity);
   }
 
-  async updateWatchListItem(
+  async deleteTvShowWatchListItem(userId: string, tvShowId: number) {
+    await this.tvShowWatchListRepository.delete({ userId, tvShowId: tvShowId });
+  }
+
+  async updateTvShowWatchListItem(
     param: {
       tvShowId: number;
       userId: string;
     },
     status: TvShowWatchListStatus,
   ) {
-    await this.watchListRepository.update(param, { status });
+    await this.tvShowWatchListRepository.update(param, { status });
+  }
+
+  async updateEpisodeWatchListItem(
+    param: {
+      episodeId: number;
+      userId: string;
+    },
+    status: TvShowWatchListStatus,
+  ) {
+    await this.episodeWatchListRepository.update(param, { status });
   }
 }
