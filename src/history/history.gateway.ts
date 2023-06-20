@@ -10,6 +10,7 @@ import { UpdateHistoryDto } from './dto/update-history.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MovieHistoryService } from '../movie-history/movie-history.service';
 import { EpisodeHistoryService } from '../episode-history/episode-history.service';
+import { HistoryUpdatedEvent } from './events/history-updated.event';
 
 @WebSocketGateway({ cors: true })
 export class HistoryGateway implements OnGatewayConnection {
@@ -20,16 +21,18 @@ export class HistoryGateway implements OnGatewayConnection {
   ) {}
 
   @SubscribeMessage('updateMediaHistory')
-  async getMessages(
+  async updateMediaHistory(
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
     try {
       const type = client.handshake.query.type;
-      const mediaHistory = {
+      const mediaHistory: HistoryUpdatedEvent = {
         mediaId: parseInt(client.handshake.query.mediaId as string),
         userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
         stoppedAt: historyUpdate.stoppedAt,
+        tvShowId: parseInt(client.handshake.query.tvShowId as string),
       };
       this.eventEmitter.emit(
         `${type}.${historyUpdate.watchStatus.toLowerCase()}`,
@@ -59,11 +62,12 @@ export class HistoryGateway implements OnGatewayConnection {
   onDisconnect(client: Socket) {
     try {
       const type = client.handshake.query.type;
-      this.eventEmitter.emit(`${type}.stopped`, {
+      const event: HistoryUpdatedEvent = {
         mediaId: parseInt(client.handshake.query.mediaId as string),
         userId: client.handshake.headers['user-id'] as string,
         sessionId: client.id,
-      });
+      };
+      this.eventEmitter.emit(`${type}.stopped`, event);
     } catch (e) {
       console.log(e);
     }
