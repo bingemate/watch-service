@@ -34,7 +34,7 @@ export class TvShowWatchListService {
   }
 
   async createEpisodeWatchListItem(item: {
-    tvShow: { tvShowId: number };
+    tvShow: { tvShowId: number; userId: string };
     episodeId: number;
     userId: string;
     status: TvShowWatchListStatus;

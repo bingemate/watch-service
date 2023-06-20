@@ -31,12 +31,20 @@ export class EpisodeWatchStatsListener {
           },
           TvShowWatchListStatus.WATCHING,
         );
-      } else {
+      } else if (!item) {
+        try {
+          this.watchListService.createTvShowWatchListItem({
+            status: TvShowWatchListStatus.WATCHING,
+            tvShowId: payload.tvShowId,
+            userId: payload.userId,
+            episodes: [],
+          });
+        } catch (e) {}
         await this.watchListService.createEpisodeWatchListItem({
           episodeId: payload.mediaId,
           userId: payload.userId,
           status: TvShowWatchListStatus.WATCHING,
-          tvShow: { tvShowId: payload.tvShowId },
+          tvShow: { tvShowId: payload.tvShowId, userId: payload.userId },
         });
       }
     } catch (e) {
