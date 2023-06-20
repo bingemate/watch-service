@@ -24,7 +24,6 @@ import { AddTvShowWatchlistItemDto } from './dto/add-tv-show-watchlist-item.dto'
 import { UpdateTvShowWatchlistItemDto } from './dto/update-tv-show-watchlist-item.dto';
 import { TvShowWatchListItemDto } from './dto/tv-show-watch-list-item.dto';
 import { TvShowWatchListItemEntity } from './tv-show-watch-list-item.entity';
-import { TvShowWatchListStatus } from './tv-show-watch-list-status.enum';
 
 @ApiTags('/tv-show-watchlist')
 @Controller('/tv-show-watchlist')
@@ -96,8 +95,37 @@ export class TvShowWatchListController {
     await this.watchListService.createTvShowWatchListItem({
       userId,
       tvShowId: tvShowId,
-      status: TvShowWatchListStatus[create.status],
+      status: create.status,
       episodes: [],
+    });
+  }
+
+  @ApiOperation({
+    description: 'Create watchlist entry',
+  })
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse({
+    description: 'Media not found',
+  })
+  @ApiParam({ name: 'tvShowId' })
+  @ApiParam({ name: 'episodeId' })
+  @ApiBody({
+    type: AddTvShowWatchlistItemDto,
+  })
+  @HttpCode(204)
+  @Post('/:tvShowId/episode/:episodeId')
+  async createEpisodeWatchListItemStatus(
+    @Headers() headers,
+    @Param('tvShowId') tvShowId: number,
+    @Param('episodeId') episodeId: number,
+    @Body() create: AddTvShowWatchlistItemDto,
+  ): Promise<void> {
+    const userId = headers['user-id'];
+    await this.watchListService.createEpisodeWatchListItem({
+      userId,
+      episodeId,
+      tvShow: { tvShowId, userId },
+      status: create.status,
     });
   }
 
@@ -121,6 +149,32 @@ export class TvShowWatchListController {
       {
         userId,
         tvShowId,
+      },
+      update.status,
+    );
+  }
+
+  @ApiOperation({
+    description: 'Update watchlist entry status',
+  })
+  @ApiNoContentResponse()
+  @ApiParam({ name: 'tvShowId' })
+  @ApiBody({
+    type: UpdateTvShowWatchlistItemDto,
+  })
+  @HttpCode(204)
+  @Put('/:tvShowId/episode/:episodeId')
+  async updateEpisodeWatchListItemStatus(
+    @Headers() headers,
+    @Param('tvShowId') tvShowId: number,
+    @Param('episodeId') episodeId: number,
+    @Body() update: UpdateTvShowWatchlistItemDto,
+  ): Promise<void> {
+    const userId = headers['user-id'];
+    await this.watchListService.updateEpisodeWatchListItem(
+      {
+        userId,
+        episodeId,
       },
       update.status,
     );

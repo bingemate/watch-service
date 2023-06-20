@@ -4,6 +4,4 @@ import { TvShowWatchListStatus } from '../tv-show-watch-list-status.enum';
 export class AddTvShowWatchlistItemDto {
   @ApiProperty({ enum: TvShowWatchListStatus })
   status: TvShowWatchListStatus;
-  @ApiProperty()
-  viewedEpisodes: number;
 }
