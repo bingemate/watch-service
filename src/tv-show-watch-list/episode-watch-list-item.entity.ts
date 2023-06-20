@@ -16,6 +16,8 @@ export class EpisodeWatchListItemEntity {
   })
   status: TvShowWatchListStatus;
 
-  @ManyToOne(() => TvShowWatchListItemEntity, (tvShow) => tvShow.episodes)
+  @ManyToOne(() => TvShowWatchListItemEntity, (tvShow) => tvShow.episodes, {
+    onDelete: 'CASCADE',
+  })
   tvShow: TvShowWatchListItemEntity;
 }
