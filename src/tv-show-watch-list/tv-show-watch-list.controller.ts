@@ -158,15 +158,14 @@ export class TvShowWatchListController {
     description: 'Update watchlist entry status',
   })
   @ApiNoContentResponse()
-  @ApiParam({ name: 'tvShowId' })
+  @ApiParam({ name: 'episodeId' })
   @ApiBody({
     type: UpdateTvShowWatchlistItemDto,
   })
   @HttpCode(204)
-  @Put('/:tvShowId/episode/:episodeId')
+  @Put('/episode/:episodeId')
   async updateEpisodeWatchListItemStatus(
     @Headers() headers,
-    @Param('tvShowId') tvShowId: number,
     @Param('episodeId') episodeId: number,
     @Body() update: UpdateTvShowWatchlistItemDto,
   ): Promise<void> {
