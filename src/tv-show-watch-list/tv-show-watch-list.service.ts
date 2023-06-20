@@ -66,6 +66,6 @@ export class TvShowWatchListService {
     },
     status: TvShowWatchListStatus,
   ) {
-    await this.tvShowWatchListRepository.update(param, { status });
+    await this.episodeWatchListRepository.update(param, { status });
   }
 }
