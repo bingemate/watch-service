@@ -28,7 +28,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   async handleConnection(client: Socket) {
     try {
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
       if (!userId) {
         client.disconnect();
       }
@@ -44,7 +44,8 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   async onDisconnect(client: Socket) {
     try {
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
+      this.watchTogetherService.deleteSession(token);
       client.leave(userId);
       const roomId = this.joinedRoom.get(userId);
       if (roomId) {
@@ -67,7 +68,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   ): Promise<void> {
     try {
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
       const roomId = uuidv4();
       const room = {
         id: roomId,
@@ -98,14 +99,11 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('joinRoom')
-  async joinRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() roomId: string,
-  ): Promise<void> {
+  joinRoom(@ConnectedSocket() client: Socket, @MessageBody() roomId: string) {
     try {
       const room = this.rooms.get(roomId);
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
       if (
         room &&
         room.invitedUsers.includes(userId) &&
@@ -141,7 +139,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   async getRooms(@ConnectedSocket() client: Socket) {
     try {
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
       const rooms = await this.getUserRooms(userId);
       client.emit('rooms', rooms);
     } catch (e) {
@@ -150,10 +148,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('addMedia')
-  async addMedia(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() mediaId: number,
-  ) {
+  addMedia(@ConnectedSocket() client: Socket, @MessageBody() mediaId: number) {
     try {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
@@ -169,7 +164,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('pause')
-  async paused(@ConnectedSocket() client: Socket) {
+  paused(@ConnectedSocket() client: Socket) {
     try {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
@@ -182,7 +177,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('play')
-  async play(@ConnectedSocket() client: Socket) {
+  play(@ConnectedSocket() client: Socket) {
     try {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
@@ -195,13 +190,10 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('playing')
-  async playing(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() position: number,
-  ) {
+  playing(@ConnectedSocket() client: Socket, @MessageBody() position: number) {
     try {
       const token = client.handshake.auth['token'];
-      const userId = await this.watchTogetherService.getSession(token);
+      const userId = this.watchTogetherService.getSession(token);
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
       if (room && room.joinedSessions.includes(client.id)) {

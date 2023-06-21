@@ -35,7 +35,7 @@ export class WatchTogetherService {
     return sessionId;
   }
 
-  async getSession(sessionId: string) {
+  getSession(sessionId: string) {
     return this.sessions.get(sessionId);
   }
 
