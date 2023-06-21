@@ -58,6 +58,7 @@ export class HistoryGateway implements OnGatewayConnection {
         mediaId: parseInt(client.handshake.query.mediaId as string),
         userId: client.handshake.headers['user-id'] as string,
         sessionId: client.id,
+        tvShowId: parseInt(client.handshake.query.tvShowId as string),
       });
     } catch (e) {
       console.log(e);
