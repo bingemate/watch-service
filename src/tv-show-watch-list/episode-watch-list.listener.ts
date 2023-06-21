@@ -33,7 +33,7 @@ export class EpisodeWatchStatsListener {
         );
       } else if (!item) {
         try {
-          this.watchListService.createTvShowWatchListItem({
+          await this.watchListService.createTvShowWatchListItem({
             status: TvShowWatchListStatus.WATCHING,
             tvShowId: payload.tvShowId,
             userId: payload.userId,
