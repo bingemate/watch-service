@@ -20,45 +20,32 @@ import { Logger } from '@nestjs/common';
 export class WatchTogetherGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
-  connectedUsers = new Map<string, string[]>();
   joinedRoom = new Map<string, string>();
   rooms = new Map<string, WatchTogetherRoom>();
 
   constructor(private watchTogetherService: WatchTogetherService) {}
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     try {
-      const userId = client.handshake.headers['user-id'] as string;
-      let sessions = this.connectedUsers.get(userId);
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
+      if (!userId) {
+        client.disconnect();
+      }
       client.on('disconnecting', () => {
         this.onDisconnect(client);
       });
-      if (sessions) {
-        sessions.push(client.id);
-      } else {
-        sessions = [client.id];
-      }
-      this.connectedUsers.set(userId, sessions);
+      client.join(userId);
     } catch (e) {
       Logger.error('Error while connecting', e);
     }
   }
 
-  onDisconnect(client: Socket) {
+  async onDisconnect(client: Socket) {
     try {
-      const userId = client.handshake.headers['user-id'] as string;
-      const userSessions = this.connectedUsers.get(userId);
-      if (!userSessions) {
-        return;
-      }
-      if (userSessions.length === 1) {
-        this.connectedUsers.delete(userId);
-      } else {
-        this.connectedUsers.set(
-          userId,
-          userSessions.filter((user) => user !== userId),
-        );
-      }
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
+      client.leave(userId);
       const roomId = this.joinedRoom.get(userId);
       if (roomId) {
         const room = this.rooms.get(roomId);
@@ -66,7 +53,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
           (user) => client.id !== user,
         );
         this.joinedRoom.delete(userId);
-        this.deleteRoom(room);
+        await this.deleteRoom(room);
       }
     } catch (e) {
       Logger.error('Error while disconnecting', e);
@@ -79,8 +66,9 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     @MessageBody() createRoom: CreateWatchTogetherRoomDto,
   ): Promise<void> {
     try {
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
       const roomId = uuidv4();
-      const userId = client.handshake.headers['user-id'] as string;
       const room = {
         id: roomId,
         ownerId: userId,
@@ -100,7 +88,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       );
       room.invitedUsers.forEach((user) => {
         if (user !== userId) {
-          this.emitToUser(user, 'invitedToRoom', room);
+          client.to(user).emit('invitedToRoom', room);
         }
       });
       client.emit('roomCreated', roomId);
@@ -116,7 +104,8 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   ): Promise<void> {
     try {
       const room = this.rooms.get(roomId);
-      const userId = client.handshake.headers['user-id'] as string;
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
       if (
         room &&
         room.invitedUsers.includes(userId) &&
@@ -151,8 +140,10 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   @SubscribeMessage('getRooms')
   async getRooms(@ConnectedSocket() client: Socket) {
     try {
-      const userId = client.handshake.headers['user-id'] as string;
-      await this.emitRoomsToUser(userId);
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
+      const rooms = await this.getUserRooms(userId);
+      client.emit('rooms', rooms);
     } catch (e) {
       Logger.error('Error on get rooms', e);
     }
@@ -195,7 +186,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
-      if (room.joinedSessions.includes(client.id)) {
+      if (room && room.joinedSessions.includes(client.id)) {
         room.status = WatchTogetherStatus.PLAYING;
       }
     } catch (e) {
@@ -209,10 +200,11 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     @MessageBody() position: number,
   ) {
     try {
-      const userId = client.handshake.headers['user-id'] as string;
+      const token = client.handshake.auth['token'];
+      const userId = await this.watchTogetherService.getSession(token);
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
-      if (room.joinedSessions.includes(client.id)) {
+      if (room && room.joinedSessions.includes(client.id)) {
         if (room.ownerId === userId) {
           room.position = position;
         }
@@ -230,7 +222,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
-      if (room.joinedSessions.includes(client.id)) {
+      if (room && room.joinedSessions.includes(client.id)) {
         room.position = position;
       }
     } catch (e) {
@@ -247,6 +239,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const roomId = this.joinedRoom.get(client.id);
       const room = this.rooms.get(roomId);
       if (
+        room &&
         room.joinedSessions.includes(client.id) &&
         playlistPosition < room.mediaIds.length
       ) {
@@ -276,7 +269,8 @@ export class WatchTogetherGateway implements OnGatewayConnection {
         this.rooms.delete(room.id);
         await this.watchTogetherService.deleteInvitationsByRoomId(room.id);
         for (const user of room.invitedUsers) {
-          await this.emitRoomsToUser(user);
+          const rooms = await this.getUserRooms(user);
+          this.server.to(user).emit('rooms', rooms);
         }
       }
     } catch (e) {
@@ -284,7 +278,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     }
   }
 
-  private async emitRoomsToUser(userId: string) {
+  private async getUserRooms(userId: string) {
     const invitations = await this.watchTogetherService.getInvitationsByUserId(
       userId,
     );
@@ -299,12 +293,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
           .then();
       }
     }
-    this.emitToUser(userId, 'rooms', rooms);
-  }
-
-  private emitToUser(userId: string, message: string, data?: unknown) {
-    this.connectedUsers
-      .get(userId)
-      ?.forEach((user) => this.server.to(user).emit(message, data));
+    return rooms;
   }
 }

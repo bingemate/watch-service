@@ -25,7 +25,6 @@ export class HistoryGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
-    console.log(client.id, 'update media');
     try {
       const type = client.handshake.query.type;
       const mediaHistory: HistoryUpdatedEvent = {
