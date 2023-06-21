@@ -1,12 +1,12 @@
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Controller, Get, Headers } from '@nestjs/common';
-import { WatchTogetherService } from '../watch-together/watch-together.service';
 import { SessionIdDto } from '../watch-together/dto/session-id.dto';
+import { HistoryService } from './history.service';
 
 @ApiTags('/history')
 @Controller('/history')
 export class HistoryController {
-  constructor(private watchTogetherService: WatchTogetherService) {}
+  constructor(private historyService: HistoryService) {}
 
   @ApiOperation({
     description: 'Get a session id',
@@ -18,7 +18,7 @@ export class HistoryController {
   async getSessionId(@Headers() headers): Promise<SessionIdDto> {
     const userId = headers['user-id'];
     return {
-      sessionId: await this.watchTogetherService.createSession(userId),
+      sessionId: await this.historyService.createSession(userId),
     };
   }
 }
