@@ -33,7 +33,7 @@ export class EpisodeWatchStatsListener {
         );
       } else if (!item) {
         try {
-          this.watchListService.createTvShowWatchListItem({
+          await this.watchListService.createTvShowWatchListItem({
             status: TvShowWatchListStatus.WATCHING,
             tvShowId: payload.tvShowId,
             userId: payload.userId,
@@ -48,7 +48,7 @@ export class EpisodeWatchStatsListener {
         });
       }
     } catch (e) {
-      Logger.error('Error on movie start event', e);
+      Logger.error('Error on episode start event', e);
     }
   }
 }

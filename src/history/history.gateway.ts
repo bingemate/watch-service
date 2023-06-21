@@ -11,12 +11,14 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MovieHistoryService } from '../movie-history/movie-history.service';
 import { EpisodeHistoryService } from '../episode-history/episode-history.service';
 import { HistoryUpdatedEvent } from './events/history-updated.event';
+import { HistoryService } from './history.service';
 
 @WebSocketGateway({ cors: true })
 export class HistoryGateway implements OnGatewayConnection {
   constructor(
     private episodeHistoryService: EpisodeHistoryService,
     private movieHistoryService: MovieHistoryService,
+    private historyService: HistoryService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -26,12 +28,14 @@ export class HistoryGateway implements OnGatewayConnection {
     @MessageBody() historyUpdate: UpdateHistoryDto,
   ): Promise<void> {
     try {
+      const token = client.handshake.auth['token'];
+      const userId = this.historyService.getSession(token);
       const type = client.handshake.query.type;
       const mediaHistory: HistoryUpdatedEvent = {
-        mediaId: parseInt(client.handshake.query.mediaId as string),
-        userId: client.handshake.headers['user-id'] as string,
+        userId,
         sessionId: client.id,
         stoppedAt: historyUpdate.stoppedAt,
+        mediaId: parseInt(client.handshake.query.mediaId as string),
         tvShowId: parseInt(client.handshake.query.tvShowId as string),
       };
       this.eventEmitter.emit(
@@ -45,6 +49,8 @@ export class HistoryGateway implements OnGatewayConnection {
 
   handleConnection(client: Socket) {
     try {
+      const token = client.handshake.auth['token'];
+      const userId = this.historyService.getSession(token);
       const mediaId = parseInt(client.handshake.query.mediaId as string);
       const type = client.handshake.query.type;
       if (isNaN(mediaId) && !type) {
@@ -55,9 +61,10 @@ export class HistoryGateway implements OnGatewayConnection {
         this.onDisconnect(client);
       });
       this.eventEmitter.emit(`${type}.started`, {
-        mediaId: parseInt(client.handshake.query.mediaId as string),
-        userId: client.handshake.headers['user-id'] as string,
+        userId,
         sessionId: client.id,
+        mediaId: parseInt(client.handshake.query.mediaId as string),
+        tvShowId: parseInt(client.handshake.query.tvShowId as string),
       });
     } catch (e) {
       console.log(e);
@@ -66,11 +73,13 @@ export class HistoryGateway implements OnGatewayConnection {
 
   onDisconnect(client: Socket) {
     try {
+      const token = client.handshake.auth['token'];
+      const userId = this.historyService.getSession(token);
       const type = client.handshake.query.type;
       const event: HistoryUpdatedEvent = {
-        mediaId: parseInt(client.handshake.query.mediaId as string),
-        userId: client.handshake.headers['user-id'] as string,
+        userId,
         sessionId: client.id,
+        mediaId: parseInt(client.handshake.query.mediaId as string),
       };
       this.eventEmitter.emit(`${type}.stopped`, event);
     } catch (e) {

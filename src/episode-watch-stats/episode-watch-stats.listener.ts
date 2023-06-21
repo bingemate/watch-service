@@ -9,11 +9,13 @@ export class EpisodeWatchStatsListener {
   constructor(private watchStatsService: EpisodeWatchStatsService) {}
 
   @OnEvent('tv-shows.started')
+  @OnEvent('tv-shows.playing')
   async handleMediaStartedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
       if (this.sessions.has(payload.sessionId)) {
         return;
       }
+      this.sessions.set(payload.sessionId, '');
       const statPeriod = await this.watchStatsService.createStatsEntity({
         episodeId: payload.mediaId,
         userId: payload.userId,
