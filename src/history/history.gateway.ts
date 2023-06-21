@@ -54,6 +54,11 @@ export class HistoryGateway implements OnGatewayConnection {
       client.on('disconnecting', () => {
         this.onDisconnect(client);
       });
+      this.eventEmitter.emit(`${type}.started`, {
+        mediaId: parseInt(client.handshake.query.mediaId as string),
+        userId: client.handshake.headers['user-id'] as string,
+        sessionId: client.id,
+      });
     } catch (e) {
       console.log(e);
     }
