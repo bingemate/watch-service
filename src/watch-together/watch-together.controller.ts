@@ -18,9 +18,7 @@ export class WatchTogetherController {
   async getSessionId(@Headers() headers): Promise<SessionIdDto> {
     const userId = headers['user-id'];
     return {
-      sessionId: await this.watchTogetherService.createSession(
-        '5e2a4f62-2d68-4b6b-b8d2-f555caa0734d',
-      ),
+      sessionId: await this.watchTogetherService.createSession(userId),
     };
   }
 }
