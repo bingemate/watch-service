@@ -75,6 +75,7 @@ export class HistoryGateway implements OnGatewayConnection {
     try {
       const token = client.handshake.auth['token'];
       const userId = this.historyService.getSession(token);
+      this.historyService.deleteSession(token);
       const type = client.handshake.query.type;
       const event: HistoryUpdatedEvent = {
         userId,
