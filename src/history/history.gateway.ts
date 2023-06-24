@@ -13,7 +13,7 @@ import { EpisodeHistoryService } from '../episode-history/episode-history.servic
 import { HistoryUpdatedEvent } from './events/history-updated.event';
 import { HistoryService } from './history.service';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ namespace: 'history', cors: true })
 export class HistoryGateway implements OnGatewayConnection {
   constructor(
     private episodeHistoryService: EpisodeHistoryService,
@@ -75,6 +75,7 @@ export class HistoryGateway implements OnGatewayConnection {
     try {
       const token = client.handshake.auth['token'];
       const userId = this.historyService.getSession(token);
+      this.historyService.deleteSession(token);
       const type = client.handshake.query.type;
       const event: HistoryUpdatedEvent = {
         userId,

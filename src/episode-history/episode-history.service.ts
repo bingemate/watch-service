@@ -19,7 +19,7 @@ export class EpisodeHistoryService {
   }
 
   async getHistory(userId: string, episodeId: number) {
-    return this.mediaHistoryRepository.findBy({ userId, episodeId });
+    return this.mediaHistoryRepository.findOneBy({ userId, episodeId });
   }
 
   async createMediaHistory(mediaHistory: {
