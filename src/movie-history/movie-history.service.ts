@@ -19,7 +19,7 @@ export class MovieHistoryService {
   }
 
   async getHistory(userId: string, movieId: number) {
-    return this.mediaHistoryRepository.findBy({ userId, movieId });
+    return this.mediaHistoryRepository.findOneBy({ userId, movieId });
   }
 
   async createMovieHistory(mediaHistory: {
