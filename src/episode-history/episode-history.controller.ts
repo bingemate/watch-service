@@ -1,10 +1,11 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   Headers,
   HttpCode,
-  Param,
+  Param, Post,
 } from '@nestjs/common';
 import { EpisodeHistoryListDto } from './dto/episode-history-list.dto';
 import {
@@ -20,9 +21,10 @@ import { EpisodeHistoryDto } from './dto/episode-history.dto';
 @ApiTags('/episode-history')
 @Controller({ path: '/episode-history' })
 export class EpisodeHistoryController {
-  constructor(private historyService: EpisodeHistoryService) {}
+  constructor(private historyService: EpisodeHistoryService) {
+  }
 
-  @ApiOperation({ description: "Get current user's history" })
+  @ApiOperation({ description: 'Get current user\'s history' })
   @ApiOkResponse({
     type: EpisodeHistoryListDto,
   })
@@ -77,6 +79,32 @@ export class EpisodeHistoryController {
       userId: userId,
       stoppedAt: history.stoppedAt,
       viewedAt: history.viewedAt,
+    };
+  }
+
+  @ApiOperation({
+    description: 'Get history entry list',
+  })
+  @ApiOkResponse({
+    type: EpisodeHistoryListDto,
+  })
+  @Post('/list')
+  async getMediaHistoryList(
+    @Headers() headers,
+    @Body() mediaList: number[],
+  ): Promise<EpisodeHistoryListDto> {
+    const userId = headers['user-id'] as string;
+    const historyList = await this.historyService.getHistoryList(
+      userId,
+      mediaList,
+    );
+    return {
+      medias: historyList.map((history) => ({
+        episodeId: history.episodeId,
+        userId: userId,
+        stoppedAt: history.stoppedAt,
+        viewedAt: history.viewedAt,
+      })),
     };
   }
 }

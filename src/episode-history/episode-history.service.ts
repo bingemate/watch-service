@@ -44,4 +44,14 @@ export class EpisodeHistoryService {
   async deleteMediaHistory(episodeId: number, userId: string): Promise<void> {
     await this.episodeHistoryRepository.delete({ episodeId, userId });
   }
+
+  async getHistoryList(userId: string, mediaList: number[]) {
+    return await this.episodeHistoryRepository
+      .createQueryBuilder()
+      .where('EpisodeHistoryEntity.userId=:userId', { userId })
+      .andWhere('EpisodeHistoryEntity.episodeId IN (:...mediaList)', {
+        mediaList,
+      })
+      .getMany();
+  }
 }
