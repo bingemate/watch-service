@@ -15,6 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MovieHistoryService } from './movie-history.service';
+import { MovieHistoryDto } from './dto/movie-history.dto';
 
 @ApiTags('/movie-history')
 @Controller({ path: '/movie-history' })
@@ -52,5 +53,28 @@ export class MovieHistoryController {
   ): Promise<void> {
     const userId = headers['user-id'] as string;
     return await this.historyService.deleteMediaHistory(movieId, userId);
+  }
+
+  @ApiOperation({
+    description: 'Get history entry',
+  })
+  @ApiOkResponse()
+  @ApiParam({ name: 'movieId' })
+  @Get('/:movieId')
+  async getMediaHistoryById(
+    @Param('movieId') movieId: number,
+    @Headers() headers,
+  ): Promise<MovieHistoryDto> {
+    const userId = headers['user-id'] as string;
+    const history = await this.historyService.getHistory(userId, movieId);
+    if (!history) {
+      return null;
+    }
+    return {
+      movieId: history.movieId,
+      userId: userId,
+      stoppedAt: history.stoppedAt,
+      viewedAt: history.viewedAt,
+    }
   }
 }
