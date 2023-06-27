@@ -39,6 +39,18 @@ export class TvShowWatchListService {
     status: TvShowWatchListStatus;
   }) {
     await this.episodeWatchListRepository.save(item);
+    if (item.status === TvShowWatchListStatus.FINISHED) {
+      const history = await this.episodeHistoryService.getHistory(item.userId, item.episodeId);
+      if (history) {
+        await this.episodeHistoryService.updateEpisodeHistory(item.userId, item.episodeId, 1);
+      }else {
+        await this.episodeHistoryService.createEpisodeHistory({
+          episodeId: item.episodeId,
+          userId: item.userId,
+          stoppedAt: 1,
+        });
+      }
+    }
   }
 
   async createTvShowWatchListItem(

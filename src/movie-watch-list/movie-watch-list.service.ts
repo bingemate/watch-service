@@ -34,6 +34,18 @@ export class MovieWatchListService {
 
   async createWatchListItem(watchListItemEntity: MovieWatchListItemEntity) {
     await this.watchListRepository.save(watchListItemEntity);
+    if (watchListItemEntity.status === MovieWatchListStatus.FINISHED) {
+      const history = await this.movieHistoryService.getHistory(watchListItemEntity.userId, watchListItemEntity.movieId);
+      if (history) {
+        await this.movieHistoryService.updateMovieHistory(watchListItemEntity.userId, watchListItemEntity.movieId, 1);
+      } else {
+        await this.movieHistoryService.createMovieHistory({
+          movieId: watchListItemEntity.movieId,
+          userId: watchListItemEntity.userId,
+          stoppedAt: 1,
+        });
+      }
+    }
   }
 
   async deleteWatchListItem(userId: string, movieId: number) {
