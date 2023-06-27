@@ -7,11 +7,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class EpisodeHistoryService {
   constructor(
     @InjectRepository(EpisodeHistoryEntity)
-    private readonly mediaHistoryRepository: Repository<EpisodeHistoryEntity>,
+    private readonly episodeHistoryRepository: Repository<EpisodeHistoryEntity>,
   ) {}
 
   async getHistoryByUserId(userId: string): Promise<EpisodeHistoryEntity[]> {
-    return await this.mediaHistoryRepository
+    return await this.episodeHistoryRepository
       .createQueryBuilder()
       .where('EpisodeHistoryEntity.userId=:userId', { userId })
       .orderBy('EpisodeHistoryEntity.viewedAt', 'DESC')
@@ -19,15 +19,15 @@ export class EpisodeHistoryService {
   }
 
   async getHistory(userId: string, episodeId: number) {
-    return this.mediaHistoryRepository.findOneBy({ userId, episodeId });
+    return this.episodeHistoryRepository.findOneBy({ userId, episodeId });
   }
 
-  async createMediaHistory(mediaHistory: {
+  async createEpisodeHistory(mediaHistory: {
     stoppedAt: number;
     episodeId: number;
     userId: string;
   }): Promise<void> {
-    await this.mediaHistoryRepository.save(mediaHistory);
+    await this.episodeHistoryRepository.save(mediaHistory);
   }
 
   async updateEpisodeHistory(
@@ -35,13 +35,13 @@ export class EpisodeHistoryService {
     episodeId: number,
     stoppedAt: number,
   ): Promise<void> {
-    await this.mediaHistoryRepository.update(
+    await this.episodeHistoryRepository.update(
       { episodeId, userId },
       { stoppedAt },
     );
   }
 
   async deleteMediaHistory(episodeId: number, userId: string): Promise<void> {
-    await this.mediaHistoryRepository.delete({ episodeId, userId });
+    await this.episodeHistoryRepository.delete({ episodeId, userId });
   }
 }
