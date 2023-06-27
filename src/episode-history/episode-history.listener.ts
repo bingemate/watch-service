@@ -21,7 +21,7 @@ export class EpisodeWatchStatsListener {
           payload.stoppedAt,
         );
       } else {
-        await this.episodeHistoryService.createMediaHistory({
+        await this.episodeHistoryService.createEpisodeHistory({
           userId: payload.userId,
           episodeId: payload.mediaId,
           stoppedAt: payload.stoppedAt,
