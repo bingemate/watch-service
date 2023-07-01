@@ -36,7 +36,23 @@ export class TvShowWatchListService {
     userId: string;
     status: TvShowWatchListStatus;
   }) {
-    await this.episodeWatchListRepository.save(item);
+    const alreadyExists = await this.episodeWatchListRepository.findOne({
+      where: {
+        episodeId: item.episodeId,
+        userId: item.userId,
+      },
+    });
+    if (alreadyExists) {
+      await this.updateEpisodeWatchListItem(
+        {
+          episodeId: item.episodeId,
+          userId: item.userId,
+        },
+        item.status,
+      );
+    } else {
+      await this.episodeWatchListRepository.save(item);
+    }
   }
 
   async createTvShowWatchListItem(
