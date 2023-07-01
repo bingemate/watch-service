@@ -24,7 +24,6 @@ import { AddTvShowWatchlistItemDto } from './dto/add-tv-show-watchlist-item.dto'
 import { UpdateTvShowWatchlistItemDto } from './dto/update-tv-show-watchlist-item.dto';
 import { TvShowWatchListItemDto } from './dto/tv-show-watch-list-item.dto';
 import { TvShowWatchListItemEntity } from './tv-show-watch-list-item.entity';
-import { EpisodeWatchListItemDto } from './dto/episode-watch-list-item.dto';
 
 @ApiTags('/tv-show-watchlist')
 @Controller('/tv-show-watchlist')
@@ -44,7 +43,10 @@ export class TvShowWatchListController {
     @Param('tvShowId') tvShowId: number,
   ): Promise<TvShowWatchListItemEntity> {
     const userId = headers['user-id'];
-    return await this.watchListService.getWatchListItemById(userId, tvShowId);
+    return await this.watchListService.getTvShowWatchListItemById(
+      userId,
+      tvShowId,
+    );
   }
 
   @ApiOperation({

@@ -11,11 +11,12 @@ export class EpisodeWatchStatsListener {
   @OnEvent('tv-shows.playing')
   async handleMediaStartedEvent(payload: HistoryUpdatedEvent): Promise<void> {
     try {
-      const item = await this.watchListService.getWatchListItemById(
-        payload.userId,
-        payload.mediaId,
-      );
-      if (item && payload.stoppedAt > 0.95) {
+      const episodeWatchListItemEntity =
+        await this.watchListService.getEpisodeWatchListItemById(
+          payload.userId,
+          payload.mediaId,
+        );
+      if (episodeWatchListItemEntity && payload.stoppedAt > 0.95) {
         await this.watchListService.updateEpisodeWatchListItem(
           {
             episodeId: payload.mediaId,
@@ -23,7 +24,10 @@ export class EpisodeWatchStatsListener {
           },
           TvShowWatchListStatus.FINISHED,
         );
-      } else if (item && item.status !== TvShowWatchListStatus.WATCHING) {
+      } else if (
+        episodeWatchListItemEntity &&
+        episodeWatchListItemEntity.status !== TvShowWatchListStatus.WATCHING
+      ) {
         await this.watchListService.updateEpisodeWatchListItem(
           {
             episodeId: payload.mediaId,
@@ -31,15 +35,21 @@ export class EpisodeWatchStatsListener {
           },
           TvShowWatchListStatus.WATCHING,
         );
-      } else if (!item) {
-        try {
+      } else if (!episodeWatchListItemEntity) {
+        const tvShowWatchListItemEntity =
+          await this.watchListService.getTvShowWatchListItemById(
+            payload.userId,
+            payload.tvShowId,
+          );
+        if (!tvShowWatchListItemEntity) {
           await this.watchListService.createTvShowWatchListItem({
             status: TvShowWatchListStatus.WATCHING,
             tvShowId: payload.tvShowId,
             userId: payload.userId,
             episodes: [],
           });
-        } catch (e) {}
+        }
+
         await this.watchListService.createEpisodeWatchListItem({
           episodeId: payload.mediaId,
           userId: payload.userId,

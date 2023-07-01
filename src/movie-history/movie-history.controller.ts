@@ -1,13 +1,17 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   Headers,
   HttpCode,
   Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { MovieHistoryListDto } from './dto/movie-history-list.dto';
 import {
+  ApiBody,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -16,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { MovieHistoryService } from './movie-history.service';
 import { MovieHistoryDto } from './dto/movie-history.dto';
+import { MovieHistoryRequestDto } from './dto/movie-history-request.dto';
 
 @ApiTags('/movie-history')
 @Controller({ path: '/movie-history' })
@@ -75,6 +80,46 @@ export class MovieHistoryController {
       userId: userId,
       stoppedAt: history.stoppedAt,
       viewedAt: history.viewedAt,
-    }
+    };
+  }
+
+  @ApiOperation({
+    description: 'Create history entry',
+  })
+  @ApiOkResponse()
+  @ApiBody({
+    type: MovieHistoryRequestDto,
+  })
+  @Post()
+  async createMediaHistory(
+    @Headers() headers,
+    @Body() body: MovieHistoryRequestDto,
+  ): Promise<void> {
+    const userId = headers['user-id'] as string;
+    return await this.historyService.createMovieHistory({
+      movieId: body.movieId,
+      userId: userId,
+      stoppedAt: body.stoppedAt,
+    });
+  }
+
+  @ApiOperation({
+    description: 'Update history entry',
+  })
+  @ApiOkResponse()
+  @ApiBody({
+    type: MovieHistoryRequestDto,
+  })
+  @Put()
+  async updateMediaHistory(
+    @Headers() headers,
+    @Body() body: MovieHistoryRequestDto,
+  ): Promise<void> {
+    const userId = headers['user-id'] as string;
+    return await this.historyService.updateMovieHistory(
+      userId,
+      body.movieId,
+      body.stoppedAt,
+    );
   }
 }

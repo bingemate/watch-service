@@ -4,12 +4,10 @@ import { MovieWatchListItemEntity } from './movie-watch-list-item.entity';
 import { MovieWatchListService } from './movie-watch-list.service';
 import { MovieWatchListController } from './movie-watch-list.controller';
 import { MovieWatchStatsListener } from './movie-watch-list.listener';
-import { MovieHistoryService } from '../movie-history/movie-history.service';
-import { MovieHistoryEntity } from '../movie-history/movie-history.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MovieWatchListItemEntity, MovieHistoryEntity])],
-  providers: [MovieWatchListService, MovieWatchStatsListener, MovieHistoryService],
+  imports: [TypeOrmModule.forFeature([MovieWatchListItemEntity])],
+  providers: [MovieWatchListService, MovieWatchStatsListener],
   controllers: [MovieWatchListController],
   exports: [MovieWatchListService],
 })
