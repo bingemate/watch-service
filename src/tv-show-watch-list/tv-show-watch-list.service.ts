@@ -20,13 +20,23 @@ export class TvShowWatchListService {
     return await this.tvShowWatchListRepository.findBy({ userId });
   }
 
-  async getWatchListItemById(
+  async getTvShowWatchListItemById(
     userId: string,
     tvShowId: number,
   ): Promise<TvShowWatchListItemEntity> {
     return await this.tvShowWatchListRepository
       .createQueryBuilder()
       .where({ userId, tvShowId })
+      .getOne();
+  }
+
+  async getEpisodeWatchListItemById(
+    userId: string,
+    episodeId: number,
+  ): Promise<EpisodeWatchListItemEntity> {
+    return await this.episodeWatchListRepository
+      .createQueryBuilder()
+      .where({ userId, episodeId })
       .getOne();
   }
 
