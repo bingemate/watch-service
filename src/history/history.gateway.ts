@@ -51,6 +51,9 @@ export class HistoryGateway implements OnGatewayConnection {
     try {
       const token = client.handshake.auth['token'];
       const userId = this.historyService.getSession(token);
+      if (!userId) {
+        client.disconnect();
+      }
       const mediaId = parseInt(client.handshake.query.mediaId as string);
       const type = client.handshake.query.type;
       if (isNaN(mediaId) && !type) {
