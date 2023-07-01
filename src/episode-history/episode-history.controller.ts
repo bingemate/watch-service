@@ -5,10 +5,13 @@ import {
   Get,
   Headers,
   HttpCode,
-  Param, Post,
+  Param,
+  Post,
+  Put,
 } from '@nestjs/common';
 import { EpisodeHistoryListDto } from './dto/episode-history-list.dto';
 import {
+  ApiBody,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -17,14 +20,14 @@ import {
 } from '@nestjs/swagger';
 import { EpisodeHistoryService } from './episode-history.service';
 import { EpisodeHistoryDto } from './dto/episode-history.dto';
+import { EpisodeHistoryRequestDto } from './dto/episode-history-request.dto';
 
 @ApiTags('/episode-history')
 @Controller({ path: '/episode-history' })
 export class EpisodeHistoryController {
-  constructor(private historyService: EpisodeHistoryService) {
-  }
+  constructor(private historyService: EpisodeHistoryService) {}
 
-  @ApiOperation({ description: 'Get current user\'s history' })
+  @ApiOperation({ description: "Get current user's history" })
   @ApiOkResponse({
     type: EpisodeHistoryListDto,
   })
@@ -80,6 +83,46 @@ export class EpisodeHistoryController {
       stoppedAt: history.stoppedAt,
       viewedAt: history.viewedAt,
     };
+  }
+
+  @ApiOperation({
+    description: 'Create history entry',
+  })
+  @ApiOkResponse()
+  @ApiBody({
+    type: EpisodeHistoryRequestDto,
+  })
+  @Post()
+  async createMediaHistory(
+    @Headers() headers,
+    @Body() body: EpisodeHistoryRequestDto,
+  ): Promise<void> {
+    const userId = headers['user-id'] as string;
+    await this.historyService.createEpisodeHistory({
+      episodeId: body.episodeId,
+      userId: userId,
+      stoppedAt: body.stoppedAt,
+    });
+  }
+
+  @ApiOperation({
+    description: 'Update history entry',
+  })
+  @ApiOkResponse()
+  @ApiBody({
+    type: EpisodeHistoryRequestDto,
+  })
+  @Put()
+  async updateMediaHistory(
+    @Headers() headers,
+    @Body() body: EpisodeHistoryRequestDto,
+  ): Promise<void> {
+    const userId = headers['user-id'] as string;
+    await this.historyService.updateEpisodeHistory(
+      userId,
+      body.episodeId,
+      body.stoppedAt,
+    );
   }
 
   @ApiOperation({
