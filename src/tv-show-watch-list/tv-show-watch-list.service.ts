@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { TvShowWatchListItemEntity } from './tv-show-watch-list-item.entity';
 import { TvShowWatchListStatus } from './tv-show-watch-list-status.enum';
 import { EpisodeWatchListItemEntity } from './episode-watch-list-item.entity';
-import { EpisodeHistoryService } from '../episode-history/episode-history.service';
 
 @Injectable()
 export class TvShowWatchListService {
@@ -13,7 +12,6 @@ export class TvShowWatchListService {
     private readonly tvShowWatchListRepository: Repository<TvShowWatchListItemEntity>,
     @InjectRepository(EpisodeWatchListItemEntity)
     private readonly episodeWatchListRepository: Repository<EpisodeWatchListItemEntity>,
-    private readonly episodeHistoryService: EpisodeHistoryService,
   ) {}
 
   async getWatchListByUserId(
@@ -39,18 +37,6 @@ export class TvShowWatchListService {
     status: TvShowWatchListStatus;
   }) {
     await this.episodeWatchListRepository.save(item);
-    if (item.status === TvShowWatchListStatus.FINISHED) {
-      const history = await this.episodeHistoryService.getHistory(item.userId, item.episodeId);
-      if (history) {
-        await this.episodeHistoryService.updateEpisodeHistory(item.userId, item.episodeId, 1);
-      }else {
-        await this.episodeHistoryService.createEpisodeHistory({
-          episodeId: item.episodeId,
-          userId: item.userId,
-          stoppedAt: 1,
-        });
-      }
-    }
   }
 
   async createTvShowWatchListItem(
@@ -81,17 +67,5 @@ export class TvShowWatchListService {
     status: TvShowWatchListStatus,
   ) {
     await this.episodeWatchListRepository.update(param, { status });
-    if (status === TvShowWatchListStatus.FINISHED) {
-      const history = await this.episodeHistoryService.getHistory(param.userId, param.episodeId);
-      if (history) {
-        await this.episodeHistoryService.updateEpisodeHistory(param.userId, param.episodeId, 1);
-      }else {
-        await this.episodeHistoryService.createEpisodeHistory({
-          episodeId: param.episodeId,
-          userId: param.userId,
-          stoppedAt: 1,
-        });
-      }
-    }
   }
 }
