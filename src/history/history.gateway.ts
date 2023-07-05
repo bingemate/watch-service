@@ -13,7 +13,7 @@ import { EpisodeHistoryService } from '../episode-history/episode-history.servic
 import { HistoryUpdatedEvent } from './events/history-updated.event';
 import { HistoryService } from './history.service';
 
-@WebSocketGateway({ namespace: 'history', cors: true })
+@WebSocketGateway(3001, { namespace: 'history', cors: true })
 export class HistoryGateway implements OnGatewayConnection {
   constructor(
     private episodeHistoryService: EpisodeHistoryService,

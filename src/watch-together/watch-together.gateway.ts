@@ -16,7 +16,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { WatchTogetherService } from './watch-together.service';
 import { Logger } from '@nestjs/common';
 
-@WebSocketGateway({ namespace: 'watch-together', cors: true })
+@WebSocketGateway(3001, { namespace: 'watch-together', cors: true })
 export class WatchTogetherGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
