@@ -45,21 +45,26 @@ export class EpisodePlaylistService {
       .getMany();
   }
 
-  async addMediaToPlaylist(
+  async addMediasToPlaylist(
     playlistId: string,
-    addMediaDto: AddPlaylistEpisodeDto,
+    addMediasDto: AddPlaylistEpisodeDto[],
   ): Promise<void> {
-    const maxPosition = await this.episodePlaylistItemRepository.maximum(
+    let maxPosition = await this.episodePlaylistItemRepository.maximum(
       'position',
       {
         playlistId,
       },
     );
-    await this.episodePlaylistItemRepository.save({
-      playlistId,
-      episodeId: addMediaDto.episodeId,
-      position: maxPosition + 1,
-    });
+    await this.episodePlaylistItemRepository.save(
+      addMediasDto.map((media) => {
+        maxPosition += 1;
+        return {
+          playlistId,
+          episodeId: media.episodeId,
+          position: maxPosition,
+        };
+      }),
+    );
   }
 
   async updatePlaylist(playlistUpdate: {
