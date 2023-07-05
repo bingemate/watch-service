@@ -23,8 +23,8 @@ import { EpisodePlaylistItemsDto } from './dto/episode-playlist-items.dto';
 import { CreateEpisodePlaylistDto } from './dto/create-episode-playlist.dto';
 import { EpisodePlaylistIdDto } from './dto/episode-playlist-id.dto';
 import { EpisodePlaylistDto } from './dto/episode-playlist.dto';
-import { AddPlaylistEpisodeDto } from './dto/add-playlist-episode.dto';
 import { EpisodePlaylistsDto } from './dto/episode-playlists.dto';
+import { AddPlaylistEpisodesDto } from './dto/add-playlist-episodes.dto';
 
 @ApiTags('/episode-playlist')
 @Controller('/episode-playlist')
@@ -85,16 +85,19 @@ export class EpisodePlaylistController {
     };
   }
 
-  @ApiBody({ type: AddPlaylistEpisodeDto })
+  @ApiBody({ type: AddPlaylistEpisodesDto })
   @ApiParam({ name: 'playlistId', format: 'uuid' })
   @ApiNoContentResponse()
   @HttpCode(204)
   @Patch('/:playlistId')
   async addMediaToPlaylist(
     @Param('playlistId') playlistId: string,
-    @Body() addMediaDto: AddPlaylistEpisodeDto,
+    @Body() addMediasDto: AddPlaylistEpisodesDto,
   ): Promise<void> {
-    await this.playlistService.addMediaToPlaylist(playlistId, addMediaDto);
+    await this.playlistService.addMediasToPlaylist(
+      playlistId,
+      addMediasDto.episodes,
+    );
   }
 
   @ApiParam({ name: 'playlistId', format: 'uuid' })
