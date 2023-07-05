@@ -46,6 +46,9 @@ export class EpisodeHistoryService {
   }
 
   async getHistoryList(userId: string, mediaList: number[]) {
+    if (mediaList.length === 0) {
+      return [];
+    }
     return await this.episodeHistoryRepository
       .createQueryBuilder()
       .where('EpisodeHistoryEntity.userId=:userId', { userId })
