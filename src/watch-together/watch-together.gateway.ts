@@ -94,9 +94,11 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const room = this.rooms.get(roomId);
       if (room && !this.clientInRoom(client)) {
+        room.status = WatchTogetherStatus.PAUSED;
         room.joinedSessions.push(client.id);
         client.join(room.id);
         client.emit('roomJoined', room);
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while joining room', e);
