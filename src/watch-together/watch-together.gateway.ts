@@ -28,7 +28,6 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const token = client.handshake.auth['token'];
       const userId = this.watchTogetherService.getSession(token);
-      console.log(userId);
       if (!userId) {
         client.disconnect();
       }
@@ -93,6 +92,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const room = this.rooms.get(roomId);
       if (room && !this.clientInRoom(client)) {
+        client.join(room.id);
         client.emit('roomJoined', room);
       }
     } catch (e) {
@@ -252,12 +252,16 @@ export class WatchTogetherGateway implements OnGatewayConnection {
   }
 
   private clientInRoom(client: Socket) {
-    return client.rooms.size > 1;
+    return client.rooms.size >= 3;
   }
 
   private getClientRoom(client: Socket): WatchTogetherRoom | undefined {
+    const token = client.handshake.auth['token'];
+    const userId = this.watchTogetherService.getSession(token);
     if (this.clientInRoom(client)) {
-      const roomId = [...client.rooms].filter((room) => client.id !== room)[0];
+      const roomId = [...client.rooms]
+        .filter((room) => room !== userId)
+        .filter((room) => client.id !== room)[0];
       this.rooms.get(roomId);
     }
     return undefined;
