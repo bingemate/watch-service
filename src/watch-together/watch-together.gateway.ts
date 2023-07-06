@@ -2,6 +2,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -17,7 +18,9 @@ import { WatchTogetherService } from './watch-together.service';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway(3001, { namespace: 'watch-together', cors: true })
-export class WatchTogetherGateway implements OnGatewayConnection {
+export class WatchTogetherGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   joinedRoom = new Map<string, string>();
@@ -29,10 +32,18 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const token = client.handshake.auth['token'];
       const userId = this.watchTogetherService.getSession(token);
+      console.log(userId);
       if (!userId) {
         client.disconnect();
       }
+      client.on('disconnected', () => {
+        console.log('disconnected');
+      });
+      client.on('disconnect', () => {
+        console.log('disconnect');
+      });
       client.on('disconnecting', () => {
+        console.log('disconnecting');
         this.onDisconnect(client);
       });
       client.join(userId);
@@ -40,11 +51,19 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       Logger.error('Error while connecting', e);
     }
   }
+  handleDisconnect(client: Socket) {
+    console.log('aaaaa');
+    const token = client.handshake.auth['token'];
+    const userId = this.watchTogetherService.getSession(token);
+    console.log(userId);
+  }
 
   async onDisconnect(client: Socket) {
     try {
+      console.log('bbbbbbbbbbb');
       const token = client.handshake.auth['token'];
       const userId = this.watchTogetherService.getSession(token);
+      console.log(userId);
       this.watchTogetherService.deleteSession(token);
       client.leave(userId);
       const roomId = this.joinedRoom.get(userId);
