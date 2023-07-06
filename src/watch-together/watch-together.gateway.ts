@@ -143,6 +143,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.getClientRoom(client);
       if (room) {
         room.status = WatchTogetherStatus.PAUSED;
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while pausing', e);
@@ -155,6 +156,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.getClientRoom(client);
       if (room) {
         room.status = WatchTogetherStatus.PLAYING;
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error on play', e);
@@ -169,6 +171,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.getClientRoom(client);
       if (room && room.ownerId === userId) {
         room.position = position;
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while playing', e);
@@ -184,6 +187,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const room = this.getClientRoom(client);
       if (room) {
         room.position = position;
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error on seek', e);
@@ -203,18 +207,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
         playlistPosition >= 0
       ) {
         room.playlistPosition = playlistPosition;
-      }
-    } catch (e) {
-      Logger.error('Error while changing media', e);
-    }
-  }
-
-  @SubscribeMessage('getRoomStatus')
-  async getRoomStatus(@ConnectedSocket() client: Socket) {
-    try {
-      const room = this.getClientRoom(client);
-      if (room) {
-        client.emit('roomStatus', room);
+        this.server.to(room.id).emit('roomStatus', room);
       }
     } catch (e) {
       Logger.error('Error while changing media', e);
