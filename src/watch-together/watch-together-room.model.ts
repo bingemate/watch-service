@@ -1,6 +1,7 @@
 export interface WatchTogetherRoom {
   id: string;
   ownerId: string;
+  joinedSessions: string[];
   invitedUsers: string[];
   mediaIds: number[];
   mediaType: 'tv-shows' | 'movies';

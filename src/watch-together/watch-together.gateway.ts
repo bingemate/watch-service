@@ -59,7 +59,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const token = client.handshake.auth['token'];
       const userId = this.watchTogetherService.getSession(token);
       const roomId = uuidv4();
-      const room = {
+      const room: WatchTogetherRoom = {
         id: roomId,
         ownerId: userId,
         joinedSessions: [],
@@ -73,15 +73,17 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       };
       room.invitedUsers.push(userId);
       this.rooms.set(roomId, room);
-      await this.watchTogetherService.createInvitations(
-        room.invitedUsers.map((userId) => ({ userId, roomId })),
-      );
+      client.emit('roomCreated', roomId);
+      this.watchTogetherService
+        .createInvitations(
+          room.invitedUsers.map((userId) => ({ userId, roomId })),
+        )
+        .then();
       room.invitedUsers.forEach((user) => {
         if (user !== userId) {
           client.to(user).emit('invitedToRoom', room);
         }
       });
-      client.emit('roomCreated', roomId);
     } catch (e) {
       Logger.error('Error on room creation', e);
     }
@@ -92,6 +94,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     try {
       const room = this.rooms.get(roomId);
       if (room && !this.clientInRoom(client)) {
+        room.joinedSessions.push(client.id);
         client.join(room.id);
         client.emit('roomJoined', room);
       }
@@ -220,10 +223,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
 
   private async deleteRoom(room: WatchTogetherRoom) {
     try {
-      console.log(this.server.adapter().prototype.rooms.length);
-      console.log(this.server.adapter().prototype.rooms.size);
-      if (this.server.adapter().prototype.rooms.length === 0) {
-        console.log('deleted room');
+      if (room.joinedSessions.length === 0) {
         this.rooms.delete(room.id);
         await this.watchTogetherService.deleteInvitationsByRoomId(room.id);
         for (const user of room.invitedUsers) {
@@ -265,7 +265,7 @@ export class WatchTogetherGateway implements OnGatewayConnection {
       const roomId = [...client.rooms]
         .filter((room) => room !== userId)
         .filter((room) => client.id !== room)[0];
-      this.rooms.get(roomId);
+      return this.rooms.get(roomId);
     }
     return undefined;
   }
@@ -274,6 +274,9 @@ export class WatchTogetherGateway implements OnGatewayConnection {
     const room = this.getClientRoom(client);
     if (room) {
       client.leave(room.id);
+      room.joinedSessions = room.joinedSessions.filter(
+        (id) => id !== client.id,
+      );
       this.deleteRoom(room).then();
     }
   }
